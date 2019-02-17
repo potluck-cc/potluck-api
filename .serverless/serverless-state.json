@@ -1,0 +1,295 @@
+{
+  "service": {
+    "service": "potluck-enduser",
+    "serviceObject": {
+      "name": "potluck-enduser"
+    },
+    "provider": {
+      "stage": "dev",
+      "region": "us-east-1",
+      "variableSyntax": "\\${([ ~:a-zA-Z0-9._'\",\\-\\/\\(\\)]+?)}",
+      "name": "aws",
+      "apiname": "potluck-enduser",
+      "versionFunctions": true,
+      "remoteFunctionData": null,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket"
+          },
+          "AppSyncDynamoDBPolicy": {
+            "Type": "AWS::IAM::ManagedPolicy",
+            "Properties": {
+              "Description": "Managed Policy to allow AWS AppSync to access tables in DynamoDB",
+              "Path": "/appsync/",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                      "dynamodb:GetItem",
+                      "dynamodb:PutItem",
+                      "dynamodb:DeleteItem",
+                      "dynamodb:UpdateItem",
+                      "dynamodb:Query",
+                      "dynamodb:Scan",
+                      "dynamodb:BatchGetItem"
+                    ],
+                    "Resource": "arn:aws:dynamodb:us-east-1:*:*"
+                  }
+                ]
+              }
+            }
+          },
+          "DynamoDBRole": {
+            "Type": "AWS::IAM::Role",
+            "Description": "IAM Role for allowing AppSync to access DynamoDB",
+            "DependsOn": [
+              "AppSyncDynamoDBPolicy"
+            ],
+            "Properties": {
+              "RoleName": "potluck-enduser-appsync-dynamodb-role",
+              "ManagedPolicyArns": [
+                {
+                  "Ref": "AppSyncDynamoDBPolicy"
+                }
+              ],
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                      "sts:AssumeRole"
+                    ],
+                    "Principal": {
+                      "Service": [
+                        "appsync.amazonaws.com"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          }
+        }
+      },
+      "coreCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket"
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          }
+        }
+      }
+    },
+    "custom": {
+      "accountId": {
+        "Ref": "AWS::AccountId"
+      },
+      "appSync": {
+        "name": "potluck-enduser-api",
+        "authenticationType": "API_KEY",
+        "mappingTemplatesLocation": "mapping-templates",
+        "serviceRole": "AppSyncServiceRole",
+        "dataSources": [
+          {
+            "type": "AMAZON_DYNAMODB",
+            "name": "ProductTableDS",
+            "description": "DynamoDB Product Table",
+            "config": {
+              "tableName": "potluck-enduser-product-table",
+              "serviceRoleArn": {
+                "Fn::GetAtt": [
+                  "DynamoDBRole",
+                  "Arn"
+                ]
+              }
+            }
+          },
+          {
+            "type": "AMAZON_DYNAMODB",
+            "name": "DoctorTableDS",
+            "description": "DynamoDB Doctor Table",
+            "config": {
+              "tableName": "potluck-enduser-doctor-table",
+              "serviceRoleArn": {
+                "Fn::GetAtt": [
+                  "DynamoDBRole",
+                  "Arn"
+                ]
+              }
+            }
+          },
+          {
+            "type": "AMAZON_DYNAMODB",
+            "name": "StoreTableDS",
+            "description": "DynamoDB Store Table",
+            "config": {
+              "tableName": "potluck-enduser-store-table",
+              "serviceRoleArn": {
+                "Fn::GetAtt": [
+                  "DynamoDBRole",
+                  "Arn"
+                ]
+              }
+            }
+          },
+          {
+            "type": "AMAZON_DYNAMODB",
+            "name": "InventoryTable",
+            "description": "DynamoDB inventory Table",
+            "config": {
+              "tableName": "potluck-enduser-inventory-table",
+              "serviceRoleArn": {
+                "Fn::GetAtt": [
+                  "DynamoDBRole",
+                  "Arn"
+                ]
+              }
+            }
+          }
+        ],
+        "mappingTemplates": [
+          {
+            "dataSource": "ProductTableDS",
+            "type": "Query",
+            "field": "listProducts",
+            "request": "common-list-request.vtl",
+            "response": "common-response.vtl"
+          },
+          {
+            "dataSource": "StoreTableDS",
+            "type": "Query",
+            "field": "listStores",
+            "request": "common-list-request.vtl",
+            "response": "common-response.vtl"
+          },
+          {
+            "dataSource": "DoctorTableDS",
+            "type": "Query",
+            "field": "listDoctors",
+            "request": "common-list-request.vtl",
+            "response": "common-response.vtl"
+          },
+          {
+            "dataSource": "InventoryTable",
+            "type": "Query",
+            "field": "listInventories",
+            "request": "common-list-request.vtl",
+            "response": "common-response.vtl"
+          },
+          {
+            "dataSource": "InventoryTable",
+            "type": "Store",
+            "field": "inventory",
+            "request": "inventory-request.vtl",
+            "response": "common-response.vtl"
+          },
+          {
+            "dataSource": "ProductTableDS",
+            "type": "InventoryItem",
+            "field": "product",
+            "request": "product-request.vtl",
+            "response": "common-response.vtl"
+          },
+          {
+            "dataSource": "StoreTableDS",
+            "type": "InventoryItem",
+            "field": "store",
+            "request": "store-request.vtl",
+            "response": "common-response.vtl"
+          }
+        ],
+        "schema": "schema.graphql"
+      }
+    },
+    "plugins": [
+      "serverless-appsync-plugin"
+    ],
+    "functions": {},
+    "resources": {
+      "Resources": {
+        "AppSyncDynamoDBPolicy": {
+          "Type": "AWS::IAM::ManagedPolicy",
+          "Properties": {
+            "Description": "Managed Policy to allow AWS AppSync to access tables in DynamoDB",
+            "Path": "/appsync/",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "dynamodb:BatchGetItem"
+                  ],
+                  "Resource": "arn:aws:dynamodb:us-east-1:*:*"
+                }
+              ]
+            }
+          }
+        },
+        "DynamoDBRole": {
+          "Type": "AWS::IAM::Role",
+          "Description": "IAM Role for allowing AppSync to access DynamoDB",
+          "DependsOn": [
+            "AppSyncDynamoDBPolicy"
+          ],
+          "Properties": {
+            "RoleName": "potluck-enduser-appsync-dynamodb-role",
+            "ManagedPolicyArns": [
+              {
+                "Ref": "AppSyncDynamoDBPolicy"
+              }
+            ],
+            "AssumeRolePolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sts:AssumeRole"
+                  ],
+                  "Principal": {
+                    "Service": [
+                      "appsync.amazonaws.com"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "Outputs": {}
+    }
+  },
+  "package": {
+    "artifactDirectoryName": "serverless/potluck-enduser/dev/1539128584145-2018-10-09T23:43:04.145Z",
+    "artifact": ""
+  }
+}

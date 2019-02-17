@@ -1,0 +1,181 @@
+---
+service: potluck-enduser
+
+frameworkVersion: ">=1.21.0 <2.0.0"
+
+plugins:
+  - serverless-appsync-plugin
+
+provider:
+  name: aws
+  region: us-east-1
+  apiname: ${opt:apiname, 'potluck-enduser'}
+
+custom:
+  accountId: { Ref: AWS::AccountId }
+  appSync:
+    name: potluck-enduser-api
+    apiKey: ${env:APPSYNC_API_KEY}
+    authenticationType: API_KEY
+    mappingTemplatesLocation: mapping-templates
+    serviceRole: "AppSyncServiceRole"
+
+    dataSources:
+      - type: AMAZON_DYNAMODB
+        name: ProductTableDS
+        description: 'DynamoDB Product Table'
+        config:
+          tableName: "potluck-enduser-product-table"
+          serviceRoleArn: { Fn::GetAtt: [ DynamoDBRole, Arn ] }
+      - type: AMAZON_DYNAMODB
+        name: DoctorTableDS
+        description: 'DynamoDB Doctor Table'
+        config:
+          tableName: "potluck-enduser-doctor-table"
+          serviceRoleArn: { Fn::GetAtt: [ DynamoDBRole, Arn ] }
+      - type: AMAZON_DYNAMODB
+        name: StoreTableDS
+        description: 'DynamoDB Store Table'
+        config:
+          tableName: "potluck-enduser-store-table"
+          serviceRoleArn: { Fn::GetAtt: [ DynamoDBRole, Arn ] }
+      - type: AMAZON_DYNAMODB
+        name: InventoryTable
+        description: 'DynamoDB inventory Table'
+        config:
+          tableName: "potluck-enduser-inventory-table"
+          serviceRoleArn: { Fn::GetAtt: [ DynamoDBRole, Arn ] }
+
+    mappingTemplates:
+      - dataSource: ProductTableDS
+        type: Query
+        field: listProducts
+        request: common-list-request.vtl
+        response: common-response.vtl
+
+      - dataSource: StoreTableDS
+        type: Query
+        field: listStores
+        request: common-list-request.vtl
+        response: common-response.vtl
+
+      - dataSource: DoctorTableDS
+        type: Query
+        field: listDoctors
+        request: common-list-request.vtl
+        response: common-response.vtl
+
+      - dataSource: InventoryTable
+        type: Query
+        field: listInventories
+        request: common-list-request.vtl
+        response: common-response.vtl
+
+      - dataSource: InventoryTable
+        type: Store
+        field: inventory
+        request: inventory-request.vtl
+        response: common-response.vtl
+
+      - dataSource: ProductTableDS
+        type: InventoryItem
+        field: product
+        request: product-request.vtl
+        response: common-response.vtl
+
+      - dataSource: StoreTableDS
+        type: InventoryItem
+        field: store
+        request: store-request.vtl
+        response: common-response.vtl
+
+    schema: schema.graphql
+
+resources:
+  Resources:
+
+    # StoreTable:
+    #   Type: "AWS::DynamoDB::Table"
+    #   DeletionPolicy: Retain
+    #   Description: "Data Store for AWS AppSync Store Type"
+    #   Properties:
+    #     TableName: ${self:provider.apiname}-store-table
+    #     AttributeDefinitions:
+    #       - AttributeName: "id"
+    #         AttributeType: "S"
+    #     KeySchema:
+    #       - AttributeName: "id"
+    #         KeyType: "HASH"
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 5
+    #       WriteCapacityUnits: 5
+
+    # ProductTable:
+    #   Type: "AWS::DynamoDB::Table"
+    #   DeletionPolicy: Retain
+    #   Description: "Data Store for AWS AppSync Product Type"
+    #   Properties:
+    #     TableName: ${self:provider.apiname}-product-table
+    #     AttributeDefinitions:
+    #       - AttributeName: "id"
+    #         AttributeType: "S"
+    #     KeySchema:
+    #       - AttributeName: "id"
+    #         KeyType: "HASH"
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 5
+    #       WriteCapacityUnits: 5
+
+    # DoctorTable:
+    #   Type: "AWS::DynamoDB::Table"
+    #   DeletionPolicy: Retain
+    #   Description: "Data Store for AWS AppSync Doctor Type"
+    #   Properties:
+    #     TableName: ${self:provider.apiname}-doctor-table
+    #     AttributeDefinitions:
+    #       - AttributeName: "id"
+    #         AttributeType: "S"
+    #     KeySchema:
+    #       - AttributeName: "id"
+    #         KeyType: "HASH"
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 5
+    #       WriteCapacityUnits: 5
+
+    AppSyncDynamoDBPolicy:
+      Type: "AWS::IAM::ManagedPolicy"
+      Properties:
+        Description: "Managed Policy to allow AWS AppSync to access tables in DynamoDB"
+        Path: /appsync/
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:DeleteItem
+                - dynamodb:UpdateItem
+                - dynamodb:Query
+                - dynamodb:Scan
+                - dynamodb:BatchGetItem
+              Resource: "arn:aws:dynamodb:us-east-1:*:*"
+
+    DynamoDBRole:
+      Type: "AWS::IAM::Role"
+      Description: "IAM Role for allowing AppSync to access DynamoDB"
+      DependsOn:
+        - AppSyncDynamoDBPolicy
+      Properties:
+        RoleName: ${self:provider.apiname}-appsync-dynamodb-role
+        ManagedPolicyArns:
+          - Ref: AppSyncDynamoDBPolicy
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - sts:AssumeRole
+              Principal:
+                Service:
+                  - appsync.amazonaws.com

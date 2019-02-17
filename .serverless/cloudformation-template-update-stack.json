@@ -1,0 +1,72 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket"
+    },
+    "AppSyncDynamoDBPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "Description": "Managed Policy to allow AWS AppSync to access tables in DynamoDB",
+        "Path": "/appsync/",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem"
+              ],
+              "Resource": "arn:aws:dynamodb:us-east-1:*:*"
+            }
+          ]
+        }
+      }
+    },
+    "DynamoDBRole": {
+      "Type": "AWS::IAM::Role",
+      "Description": "IAM Role for allowing AppSync to access DynamoDB",
+      "DependsOn": [
+        "AppSyncDynamoDBPolicy"
+      ],
+      "Properties": {
+        "RoleName": "potluck-enduser-appsync-dynamodb-role",
+        "ManagedPolicyArns": [
+          {
+            "Ref": "AppSyncDynamoDBPolicy"
+          }
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      }
+    }
+  }
+}
