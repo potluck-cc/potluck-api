@@ -1,0 +1,17 @@
+{
+  "version": "2017-02-28",
+  "operation": "DeleteItem",
+  "key": {
+    "storeId": $util.dynamodb.toDynamoDBJson($ctx.args.input.storeId),
+    "createdAt": $util.dynamodb.toDynamoDBJson($ctx.args.input.createdAt)
+  },
+  "condition" : {
+      "expression": "contains(#owner, :expectedOwner)",
+        "expressionNames": {
+          "#owner": "owner"
+      },
+      "expressionValues": {
+        ":expectedOwner": { "S": "${context.identity.username}" },
+      }
+  }
+}

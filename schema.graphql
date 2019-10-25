@@ -1,145 +1,143 @@
 # Doctors
 enum County {
-	Atlantic
-	Bergen
-	Burlington
-	Camden
-	Capemay
-	Cumberland
-	Essex
-	Gloucester
-	Hudson
-	Hunterdon
-	Mercer
-	Middlesex
-	Monmouth
-	Morris
-	Ocean
-	Passaic
-	Salem
-	Somerset
-	Sussex
-	Union
-	Warren
+  Atlantic
+  Bergen
+  Burlington
+  Camden
+  Capemay
+  Cumberland
+  Essex
+  Gloucester
+  Hudson
+  Hunterdon
+  Mercer
+  Middlesex
+  Monmouth
+  Morris
+  Ocean
+  Passaic
+  Salem
+  Somerset
+  Sussex
+  Union
+  Warren
 }
 
 type Doctor {
-	id: ID!
-	name: String!
-	address: String!
-	county: County!
-	newPatients: Boolean!
-	hours: [String]!
-	specialty: String!
-	phone: String
-	latitude: String!
-	longitude: String!
+  id: ID!
+  name: String!
+  address: String!
+  county: County!
+  newPatients: Boolean!
+  hours: [String]!
+  specialty: String!
+  phone: String
+  latitude: String!
+  longitude: String!
 }
 
 type DoctorConnection {
-	items: [Doctor]
-	nextToken: String
+  items: [Doctor]
+  nextToken: String
 }
 
 input TableDoctorFilterInput {
-	name: TableStringFilterInput
-	address: TableStringFilterInput
-	newPatients: TableBooleanFilterInput
-	hours: TableStringFilterInput
+  name: TableStringFilterInput
+  address: TableStringFilterInput
+  newPatients: TableBooleanFilterInput
+  hours: TableStringFilterInput
+  county: TableStringFilterInput
 }
-
 
 #Products
 
 enum StrainType {
-	Sativa
-	Indica
-	CBD
-	Hybrid
+  Sativa
+  Indica
+  CBD
+  Hybrid
 }
 
 type Effect {
-	munchies: Int
-	relaxed: Int
-	sleepy: Int
-	euphoric: Int
-	happy: Int
-	creative: Int
-	focused: Int
-	energetic: Int
+  munchies: Int
+  relaxed: Int
+  sleepy: Int
+  euphoric: Int
+  happy: Int
+  creative: Int
+  focused: Int
+  energetic: Int
 }
 
 type Medical {
-	stress: Int
-	insomnia: Int
-	painRelief: Int
-	fatigue: Int
-	depression: Int
-	ptsd: Int
-	inflammation: Int
-	muscleSpasms: Int
+  stress: Int
+  insomnia: Int
+  painRelief: Int
+  fatigue: Int
+  depression: Int
+  ptsd: Int
+  inflammation: Int
+  muscleSpasms: Int
 }
 
 type Negative {
-	cottonMouth: Int
-	anxious: Int
-	paranoid: Int
-	dizzy: Int
-	dryEye: Int
-	headache: Int
-	rapidHeartbeat: Int
-	impairedMemory: Int
+  cottonMouth: Int
+  anxious: Int
+  paranoid: Int
+  dizzy: Int
+  dryEye: Int
+  headache: Int
+  rapidHeartbeat: Int
+  impairedMemory: Int
 }
 
 type Product {
-	id: ID!
-	strainType: StrainType!
-	name: String!
-	description: String!
-	effects: Effect
-	medical: Medical
-	negatives: Negative
-	totalReviews: Int
+  id: ID!
+  strainType: StrainType!
+  name: String!
+  description: String!
+  effects: Effect
+  medical: Medical
+  negatives: Negative
+  totalReviews: Int
 }
 
 type ProductConnection {
-	items: [Product]
-	nextToken: String
+  items: [Product]
+  nextToken: String
 }
 
 input TableProductFilterInput {
-	id: TableIDFilterInput
-	name: TableStringFilterInput
-	description: TableStringFilterInput
+  id: TableIDFilterInput
+  name: TableStringFilterInput
+  description: TableStringFilterInput
 }
-
 
 # Dispensaries
 type Store {
-	id: ID!
-	name: String!
-	address: String!
-	inventory: InventoryItemConnection
-	hours: [String]!
-	image: String!
-	phone: String
-	town: String!
-	link: String
+  id: ID!
+  name: String!
+  address: String!
+  inventory: InventoryItemConnection
+  hours: [String]!
+  image: String!
+  phone: String
+  town: String!
+  link: String
 }
 
 type StoreConnection {
-	items: [Store]
-	nextToken: String
+  items: [Store]
+  nextToken: String
 }
 
 input TableStoreFilterInput {
-	id: TableIDFilterInput
-	name: TableStringFilterInput
-	address: TableStringFilterInput
-	hours: TableStringFilterInput
-	inventory: TableStringFilterInput
+  id: TableIDFilterInput
+  name: TableStringFilterInput
+  address: TableStringFilterInput
+  hours: TableStringFilterInput
+  inventory: TableStringFilterInput
 }
-
 
 # Inventories
 type InventoryItem {
@@ -149,66 +147,80 @@ type InventoryItem {
 }
 
 type InventoryItemConnection {
-	items: [InventoryItem]
-	nextToken: String
+  items: [InventoryItem]
+  nextToken: String
 }
 
 input TableInventoryItemFilterInput {
-	id: TableIDFilterInput
-	storeId: TableStringFilterInput
-  	product: TableStringFilterInput
+  id: TableIDFilterInput
+  storeId: TableStringFilterInput
+  product: TableStringFilterInput
 }
 
-
 input TableStringFilterInput {
-	ne: String
-	eq: String
-	le: String
-	lt: String
-	ge: String
-	gt: String
-	contains: String
-	notContains: String
-	between: [String]
-	beginsWith: String
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
 }
 
 input TableBooleanFilterInput {
-	ne: Boolean
-	eq: Boolean
+  ne: Boolean
+  eq: Boolean
 }
 
 input TableIDFilterInput {
-	ne: ID
-	eq: ID
-	le: ID
-	lt: ID
-	ge: ID
-	gt: ID
-	contains: ID
-	notContains: ID
-	between: [ID]
-	beginsWith: ID
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
 }
 
 input TableIntFilterInput {
-	ne: Int
-	eq: Int
-	le: Int
-	lt: Int
-	ge: Int
-	gt: Int
-	contains: Int
-	notContains: Int
-	between: [Int]
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  contains: Int
+  notContains: Int
+  between: [Int]
 }
 
-
 type Query {
-	listDoctors(filter: TableDoctorFilterInput, limit: Int, nextToken: String): DoctorConnection
-	listStores(filter: TableStoreFilterInput, limit: Int, nextToken: String): StoreConnection
-	listProducts(filter: TableProductFilterInput, limit: Int, nextToken: String): ProductConnection
-	listInventories(filter: TableInventoryItemFilterInput, limit: Int, nextToken: String): InventoryItemConnection
+  listDoctors(
+    filter: TableDoctorFilterInput
+    limit: Int
+    nextToken: String
+  ): DoctorConnection
+  listStores(
+    filter: TableStoreFilterInput
+    limit: Int
+    nextToken: String
+  ): StoreConnection
+  listProducts(
+    filter: TableProductFilterInput
+    limit: Int
+    nextToken: String
+  ): ProductConnection
+  listInventories(
+    filter: TableInventoryItemFilterInput
+    limit: Int
+    nextToken: String
+  ): InventoryItemConnection
 }
 
 type Schema {

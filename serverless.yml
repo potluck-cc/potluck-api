@@ -1,5 +1,5 @@
 ---
-service: potluck-enduser
+service: potluck-api-prod
 
 frameworkVersion: ">=1.21.0 <2.0.0"
 
@@ -9,138 +9,595 @@ plugins:
 provider:
   name: aws
   region: us-east-1
-  apiname: ${opt:apiname, 'potluck-enduser'}
+  apiname: ${opt:apiname, 'potluck-api-prod'}
 
 custom:
   accountId: { Ref: AWS::AccountId }
   appSync:
-    name: potluck-enduser-api
-    apiKey: ${env:APPSYNC_API_KEY}
-    authenticationType: API_KEY
-    mappingTemplatesLocation: mapping-templates
-    serviceRole: "AppSyncServiceRole"
+    - name: potluck-enterprise-prod
+      authenticationType: AMAZON_COGNITO_USER_POOLS
+      userPoolConfig:
+        awsRegion: us-east-1
+        defaultAction: ALLOW
+        userPoolId: us-east-1_ys3BakDVJ
+      serviceRole: "AppSyncServiceRole"
+      schema: enterprise/schema.graphql
+      mappingTemplatesLocation: mapping-templates
 
-    dataSources:
-      - type: AMAZON_DYNAMODB
-        name: ProductTableDS
-        description: 'DynamoDB Product Table'
-        config:
-          tableName: "potluck-enduser-product-table"
-          serviceRoleArn: { Fn::GetAtt: [ DynamoDBRole, Arn ] }
-      - type: AMAZON_DYNAMODB
-        name: DoctorTableDS
-        description: 'DynamoDB Doctor Table'
-        config:
-          tableName: "potluck-enduser-doctor-table"
-          serviceRoleArn: { Fn::GetAtt: [ DynamoDBRole, Arn ] }
-      - type: AMAZON_DYNAMODB
-        name: StoreTableDS
-        description: 'DynamoDB Store Table'
-        config:
-          tableName: "potluck-enduser-store-table"
-          serviceRoleArn: { Fn::GetAtt: [ DynamoDBRole, Arn ] }
-      - type: AMAZON_DYNAMODB
-        name: InventoryTable
-        description: 'DynamoDB inventory Table'
-        config:
-          tableName: "potluck-enduser-inventory-table"
-          serviceRoleArn: { Fn::GetAtt: [ DynamoDBRole, Arn ] }
+      dataSources:
+        - type: AMAZON_DYNAMODB
+          name: ProductTableProd
+          description: "Product Table"
+          config:
+            tableName: "product-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: StoreTableProd
+          description: "Store Table"
+          config:
+            tableName: "store-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: InventoryTableProd
+          description: "Inventory Table"
+          config:
+            tableName: "inventory-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
 
-    mappingTemplates:
-      - dataSource: ProductTableDS
-        type: Query
-        field: listProducts
-        request: common-list-request.vtl
-        response: common-response.vtl
+      mappingTemplates:
+        # Store Mutations
+        - dataSource: StoreTableProd
+          type: Mutation
+          field: createStore
+          request: common-create-request.vtl
+          response: common-response.vtl
 
-      - dataSource: StoreTableDS
-        type: Query
-        field: listStores
-        request: common-list-request.vtl
-        response: common-response.vtl
+        - dataSource: StoreTableProd
+          type: Mutation
+          field: updateStore
+          request: update-store-request.vtl
+          response: common-response.vtl
 
-      - dataSource: DoctorTableDS
-        type: Query
-        field: listDoctors
-        request: common-list-request.vtl
-        response: common-response.vtl
+        - dataSource: StoreTableProd
+          type: Mutation
+          field: deleteStore
+          request: delete-store-request.vtl
+          response: common-response.vtl
 
-      - dataSource: InventoryTable
-        type: Query
-        field: listInventories
-        request: common-list-request.vtl
-        response: common-response.vtl
+        # Store Queries
+        - dataSource: StoreTableProd
+          type: Query
+          field: getStore
+          request: get-store-request.vtl
+          response: common-response.vtl
 
-      - dataSource: InventoryTable
-        type: Store
-        field: inventory
-        request: inventory-request.vtl
-        response: common-response.vtl
+        - dataSource: StoreTableProd
+          type: Query
+          field: getCompanyStores
+          request: get-company-stores-request.vtl
+          response: common-response.vtl
 
-      - dataSource: ProductTableDS
-        type: InventoryItem
-        field: product
-        request: product-request.vtl
-        response: common-response.vtl
+        # Inventory Mutations
+        - dataSource: InventoryTableProd
+          type: Mutation
+          field: createInventoryItem
+          request: common-create-with-owner-request.vtl
+          response: common-response.vtl
 
-      - dataSource: StoreTableDS
-        type: InventoryItem
-        field: store
-        request: store-request.vtl
-        response: common-response.vtl
+        - dataSource: InventoryTableProd
+          type: Mutation
+          field: deleteInventoryItem
+          request: delete-inventory-item-request.vtl
+          response: common-response.vtl
 
-    schema: schema.graphql
+        - dataSource: InventoryTableProd
+          type: Mutation
+          field: updateInventoryItem
+          request: update-inventory-item-request.vtl
+          response: common-response.vtl
+
+        # Inventory Queries
+        - dataSource: InventoryTableProd
+          type: Query
+          field: getStoreInventory
+          request: get-store-inventory-request.vtl
+          response: common-response.vtl
+
+        - dataSource: ProductTableProd
+          type: InventoryItem
+          field: product
+          request: product-request.vtl
+          response: common-response.vtl
+
+        # Product Mutations
+        - dataSource: ProductTableProd
+          type: Mutation
+          field: createProduct
+          request: common-create-request.vtl
+          response: common-response.vtl
+
+        # Product Queries
+        - dataSource: ProductTableProd
+          type: Query
+          field: getProduct
+          request: get-product-request.vtl
+          response: common-response.vtl
+
+    - name: potluck-market-api-prod
+      authenticationType: AMAZON_COGNITO_USER_POOLS
+      userPoolConfig:
+        awsRegion: us-east-1
+        defaultAction: ALLOW
+        userPoolId: us-east-1_CwBA0oPZ3
+      serviceRole: "AppSyncServiceRole"
+      schema: market/schema.graphql
+      mappingTemplatesLocation: mapping-templates
+      additionalAuthenticationProviders:
+        - authenticationType: API_KEY
+
+      dataSources:
+        - type: AMAZON_DYNAMODB
+          name: ProductTableProd
+          description: "Product Table"
+          config:
+            tableName: "product-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: StoreTableProd
+          description: "Store Table"
+          config:
+            tableName: "store-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: InventoryTableProd
+          description: "Inventory Table"
+          config:
+            tableName: "inventory-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: DoctorTableProd
+          description: "DynamoDB Doctor Table"
+          config:
+            tableName: "doctor-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: UserTableProd
+          description: "DynamoDB User Table"
+          config:
+            tableName: "user-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+
+      mappingTemplates:
+        - dataSource: StoreTableProd
+          type: Query
+          field: listStores
+          request: common-list-request.vtl
+          response: common-response.vtl
+
+        - dataSource: InventoryTableProd
+          type: Store
+          field: inventory
+          request: inventory-from-source-id-request.vtl
+          response: common-response.vtl
+
+        - dataSource: ProductTableProd
+          type: InventoryItem
+          field: product
+          request: product-request.vtl
+          response: common-response.vtl
+
+        - dataSource: DoctorTableProd
+          type: Query
+          field: getDoctor
+          request: common-get-request.vtl
+          response: common-response.vtl
+
+        - dataSource: DoctorTableProd
+          type: Mutation
+          field: createDoctor
+          request: common-create-with-owner-request.vtl
+          response: common-response.vtl
+
+        - dataSource: DoctorTableProd
+          type: Mutation
+          field: updateDoctor
+          request: update-doctor-request.vtl
+          response: common-response.vtl
+
+        - dataSource: UserTableProd
+          type: Query
+          field: getUser
+          request: common-get-request.vtl
+          response: owner-can-read-response.vtl
+
+        - dataSource: UserTableProd
+          type: Mutation
+          field: createUser
+          request: common-create-with-owner-request.vtl
+          response: common-response.vtl
+
+        - dataSource: UserTableProd
+          type: Mutation
+          field: updateUser
+          request: update-user-request.vtl
+          response: common-response.vtl
+
+    - name: potluck-med-prod
+      authenticationType: AMAZON_COGNITO_USER_POOLS
+      userPoolConfig:
+        awsRegion: us-east-1
+        defaultAction: ALLOW
+        userPoolId: us-east-1_CwBA0oPZ3
+      serviceRole: "AppSyncServiceRole"
+      schema: med/schema.graphql
+      mappingTemplatesLocation: mapping-templates
+
+      dataSources:
+        - type: AMAZON_DYNAMODB
+          name: DoctorTableProd
+          description: "Doctor Table"
+          config:
+            tableName: "doctor-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: UserTableProd
+          description: "DynamoDB User Table"
+          config:
+            tableName: "user-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: AppointmentTableProd
+          description: "Appointment Table"
+          config:
+            tableName: "appointment-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: ConversationTableProd
+          description: "Conversation Table"
+          config:
+            tableName: "conversation-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: MessageTableProd
+          description: "Message Table"
+          config:
+            tableName: "message-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+
+      mappingTemplates:
+        #Query
+        - dataSource: DoctorTableProd
+          type: Query
+          field: getDoctor
+          request: common-get-request.vtl
+          response: common-response.vtl
+
+        - dataSource: DoctorTableProd
+          type: Query
+          field: listDoctors
+          request: common-list-request.vtl
+          response: common-response.vtl
+
+        - dataSource: DoctorTableProd
+          type: Query
+          field: getDoctorsByCounty
+          request: get-doctors-by-county-request.vtl
+          response: common-response.vtl
+
+        - dataSource: UserTableProd
+          type: Query
+          field: getUser
+          request: common-get-request.vtl
+          response: owner-can-read-response.vtl
+
+        - dataSource: AppointmentTableProd
+          type: Query
+          field: getAppointment
+          request: common-get-request.vtl
+          response: has-access-can-read-response.vtl
+
+        - dataSource: AppointmentTableProd
+          type: Query
+          field: getAppointmentsByPatient
+          request: get-appointments-by-patient-request.vtl
+          response: common-response.vtl
+
+        - dataSource: AppointmentTableProd
+          type: Query
+          field: getAppointmentsByDoctor
+          request: get-appointments-by-doctor-request.vtl
+          response: common-response.vtl
+
+        - dataSource: ConversationTableProd
+          type: Query
+          field: getConversation
+          request: common-get-request.vtl
+          response: has-access-can-read-response.vtl
+
+        - dataSource: ConversationTableProd
+          type: Query
+          field: getConversationsByDoctor
+          request: get-conversations-by-doctor-request.vtl
+          response: common-response.vtl
+
+        - dataSource: ConversationTableProd
+          type: Query
+          field: getConversationsByPatient
+          request: get-conversations-by-patient-request.vtl
+          response: common-response.vtl
+
+        - dataSource: MessageTableProd
+          type: Query
+          field: getMessagesFromAConversation
+          request: get-messages-from-a-conversation-request.vtl
+          response: common-response.vtl
+
+        - dataSource: MessageTableProd
+          type: Conversation
+          field: messages
+          request: get-messages-from-a-conversation-source-id-request.vtl
+          response: common-response.vtl
+
+          #Mutations
+        - dataSource: AppointmentTableProd
+          type: Mutation
+          field: createAppointment
+          request: create-appointment-request.vtl
+          response: common-response.vtl
+
+        - dataSource: ConversationTableProd
+          type: Mutation
+          field: createConversation
+          request: create-conversation-request.vtl
+          response: common-response.vtl
+
+        - dataSource: MessageTableProd
+          type: Mutation
+          field: createMessage
+          request: create-message-request.vtl
+          response: common-response.vtl
+
+        - dataSource: AppointmentTableProd
+          type: Mutation
+          field: updateAppointment
+          request: update-appointment-request.vtl
+          response: common-response.vtl
+
+        - dataSource: ConversationTableProd
+          type: Mutation
+          field: updateConversation
+          request: update-conversation-request.vtl
+          response: common-response.vtl
+
+        - dataSource: DoctorTableProd
+          type: Mutation
+          field: updateDoctor
+          request: update-doctor-request.vtl
+          response: common-response.vtl
+
+        - dataSource: UserTableProd
+          type: Mutation
+          field: createUser
+          request: common-create-with-owner-request.vtl
+          response: common-response.vtl
+
+        - dataSource: UserTableProd
+          type: Mutation
+          field: updateUser
+          request: update-user-request.vtl
+          response: common-response.vtl
 
 resources:
   Resources:
+    StoreTableProd:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync Store Type"
+      Properties:
+        TableName: store-table-prod
+        AttributeDefinitions:
+          - AttributeName: "companyId"
+            AttributeType: "S"
+          - AttributeName: "id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "companyId"
+            KeyType: "HASH"
+          - AttributeName: "id"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
-    # StoreTable:
+    ProductTableProd:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync Product Type"
+      Properties:
+        TableName: product-table-prod
+        AttributeDefinitions:
+          - AttributeName: "slug"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "slug"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    InventoryTableProd:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync Inventory Type"
+      Properties:
+        TableName: inventory-table-prod
+        AttributeDefinitions:
+          - AttributeName: "storeId"
+            AttributeType: "S"
+          - AttributeName: "createdAt"
+            AttributeType: "N"
+        KeySchema:
+          - AttributeName: "storeId"
+            KeyType: "HASH"
+          - AttributeName: "createdAt"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    DoctorTableProd:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync Doctor Type"
+      Properties:
+        TableName: doctor-table-prod
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: "S"
+          - AttributeName: "metadata"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: metadata-index
+            KeySchema:
+              - AttributeName: "metadata"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: "1"
+              WriteCapacityUnits: "1"
+
+    UserTableProd:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync User Type"
+      Properties:
+        TableName: user-table-prod
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    # ConversationTableProd:
     #   Type: "AWS::DynamoDB::Table"
     #   DeletionPolicy: Retain
-    #   Description: "Data Store for AWS AppSync Store Type"
+    #   Description: "Data Store for AWS AppSync Conversation Type"
     #   Properties:
-    #     TableName: ${self:provider.apiname}-store-table
+    #     TableName: conversation-table-prod
     #     AttributeDefinitions:
     #       - AttributeName: "id"
+    #         AttributeType: "S"
+    #       - AttributeName: "updatedAt"
+    #         AttributeType: "N"
+    #       - AttributeName: "patientId"
+    #         AttributeType: "S"
+    #       - AttributeName: "doctorId"
     #         AttributeType: "S"
     #     KeySchema:
     #       - AttributeName: "id"
     #         KeyType: "HASH"
     #     ProvisionedThroughput:
-    #       ReadCapacityUnits: 5
-    #       WriteCapacityUnits: 5
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     GlobalSecondaryIndexes:
+    #       - IndexName: patient-timestamp-index
+    #         KeySchema:
+    #           - AttributeName: "patientId"
+    #             KeyType: "HASH"
+    #           - AttributeName: "updatedAt"
+    #             KeyType: "RANGE"
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: "1"
+    #           WriteCapacityUnits: "1"
+    #       - IndexName: doctor-timestamp-index
+    #         KeySchema:
+    #           - AttributeName: "doctorId"
+    #             KeyType: "HASH"
+    #           - AttributeName: "updatedAt"
+    #             KeyType: "RANGE"
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: "1"
+    #           WriteCapacityUnits: "1"
 
-    # ProductTable:
+    # MessageTableProd:
     #   Type: "AWS::DynamoDB::Table"
     #   DeletionPolicy: Retain
-    #   Description: "Data Store for AWS AppSync Product Type"
+    #   Description: "Data Store for AWS AppSync Message Type"
     #   Properties:
-    #     TableName: ${self:provider.apiname}-product-table
+    #     TableName: message-table-prod
+    #     AttributeDefinitions:
+    #       - AttributeName: "conversationId"
+    #         AttributeType: "S"
+    #       - AttributeName: "createdAt"
+    #         AttributeType: "N"
+    #     KeySchema:
+    #       - AttributeName: "conversationId"
+    #         KeyType: "HASH"
+    #       - AttributeName: "createdAt"
+    #         KeyType: "RANGE"
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+
+    # AppointmentTableProd:
+    #   Type: "AWS::DynamoDB::Table"
+    #   DeletionPolicy: Retain
+    #   Description: "Data Store for AWS AppSync Appointment Type"
+    #   Properties:
+    #     TableName: appointment-table-prod
     #     AttributeDefinitions:
     #       - AttributeName: "id"
     #         AttributeType: "S"
+    #       - AttributeName: "patientId"
+    #         AttributeType: "S"
+    #       - AttributeName: "doctorId"
+    #         AttributeType: "S"
+    #       - AttributeName: "date"
+    #         AttributeType: "N"
     #     KeySchema:
     #       - AttributeName: "id"
     #         KeyType: "HASH"
     #     ProvisionedThroughput:
-    #       ReadCapacityUnits: 5
-    #       WriteCapacityUnits: 5
-
-    # DoctorTable:
-    #   Type: "AWS::DynamoDB::Table"
-    #   DeletionPolicy: Retain
-    #   Description: "Data Store for AWS AppSync Doctor Type"
-    #   Properties:
-    #     TableName: ${self:provider.apiname}-doctor-table
-    #     AttributeDefinitions:
-    #       - AttributeName: "id"
-    #         AttributeType: "S"
-    #     KeySchema:
-    #       - AttributeName: "id"
-    #         KeyType: "HASH"
-    #     ProvisionedThroughput:
-    #       ReadCapacityUnits: 5
-    #       WriteCapacityUnits: 5
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     GlobalSecondaryIndexes:
+    #       - IndexName: patient-index
+    #         KeySchema:
+    #           - AttributeName: "patientId"
+    #             KeyType: "HASH"
+    #           - AttributeName: "date"
+    #             KeyType: "RANGE"
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: "1"
+    #           WriteCapacityUnits: "1"
+    #       - IndexName: doctor-index
+    #         KeySchema:
+    #           - AttributeName: "doctorId"
+    #             KeyType: "HASH"
+    #           - AttributeName: "date"
+    #             KeyType: "RANGE"
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: "1"
+    #           WriteCapacityUnits: "1"
 
     AppSyncDynamoDBPolicy:
       Type: "AWS::IAM::ManagedPolicy"

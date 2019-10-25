@@ -1,0 +1,19 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "query" : {
+        "expression" : "#metadata = :metadata",
+        "expressionNames" : {
+            "#metadata": "metadata"
+        },
+        "expressionValues" : {
+            ":metadata": { "S" : "$context.args.metadata" }
+        }
+    },
+    "index": "metadata-index",
+    "nextToken" : $util.toJson($util.defaultIfNullOrEmpty($ctx.args.nextToken, null)),
+    "scanIndexForward" : false,
+    "consistentRead" : false,
+    "select" : "ALL_ATTRIBUTES",
+    "filter" : #if($context.args.filter) $util.transform.toDynamoDBFilterExpression($ctx.args.filter) #else null #end,
+}
