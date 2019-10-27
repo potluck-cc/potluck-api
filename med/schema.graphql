@@ -1,410 +1,441 @@
-enum County {
-  Atlantic
-  Bergen
-  Burlington
-  Camden
-  Capemay
-  Cumberland
-  Essex
-  Gloucester
-  Hudson
-  Hunterdon
-  Mercer
-  Middlesex
-  Monmouth
-  Morris
-  Ocean
-  Passaic
-  Salem
-  Somerset
-  Sussex
-  Union
-  Warren
-}
 
-enum State {
-  NJ
-}
+  input TableBooleanFilterInput {
+    eq: Boolean
+    ne: Boolean
+  }
 
-type Doctor {
-  id: ID!
-  address: String!
-  county: County!
-  metadata: String!
-  hours: [String]
-  latitude: String!
-  longitude: String!
-  name: String!
-  newPatients: Boolean
-  phone: String
-  specialty: String!
-  receiveChats: Boolean
-  bio: String
-  image: AWSURL
-  insuranceAccpeted: Boolean
-  firstVisit: String
-  followUp: String
-  renewal: String
-  bookingFee: String
-  visitLength: String
-  marketToken: String
-  medToken: String
-}
+  input TableFloatFilterInput {
+    between: [Float]
+    contains: Float
+    eq: Float
+    ge: Float
+    gt: Float
+    le: Float
+    lt: Float
+    ne: Float
+    notContains: Float
+  }
 
-type DoctorConnection {
-  items: [Doctor]
-  nextToken: String
-}
+  input TableIDFilterInput {
+    beginsWith: ID
+    between: [ID]
+    contains: ID
+    eq: ID
+    ge: ID
+    gt: ID
+    le: ID
+    lt: ID
+    ne: ID
+    notContains: ID
+  }
 
-input TableDoctorFilterInput {
-  address: TableStringFilterInput
-  hours: TableStringFilterInput
-  name: TableStringFilterInput
-  newPatients: TableBooleanFilterInput
-  county: TableStringFilterInput
-}
+  input TableIntFilterInput {
+    between: [Int]
+    contains: Int
+    eq: Int
+    ge: Int
+    gt: Int
+    le: Int
+    lt: Int
+    ne: Int
+    notContains: Int
+  }
 
-input UpdateDoctorInput {
-  id: ID!
-  address: String
-  hours: [String]
-  name: String
-  phone: String
-  receiveChats: Boolean
-  bio: String
-  image: AWSURL
-  firstVisit: String
-  followUp: String
-  renewal: String
-  bookingFee: String
-  visitLength: String
-  insuranceAccpeted: Boolean
-  metadata: String
-  marketToken: String
-  medToken: String
-}
+  input TableStringFilterInput {
+    beginsWith: String
+    between: [String]
+    contains: String
+    eq: String
+    ge: String
+    gt: String
+    le: String
+    lt: String
+    ne: String
+    notContains: String
+  }
 
-enum AppointmentStatus {
-  pending
-  confirmed
-  cancelled
-}
+    enum County {
+    Atlantic
+    Bergen
+    Burlington
+    Camden
+    Capemay
+    Cumberland
+    Essex
+    Gloucester
+    Hudson
+    Hunterdon
+    Mercer
+    Middlesex
+    Monmouth
+    Morris
+    Ocean
+    Passaic
+    Salem
+    Somerset
+    Sussex
+    Union
+    Warren
+    }
 
-type Appointment {
-  id: ID!
-  doctor: Doctor!
-  patient: User!
-  doctorId: ID!
-  patientId: ID!
-  createdAt: AWSTimestamp!
-  updatedAt: AWSTimestamp
-  status: AppointmentStatus!
-  date: AWSTimestamp!
-}
+    enum State {
+        NJ
+    }
 
-type AppointmentConnection {
-  items: [Appointment]
-  nextToken: String
-}
+    enum AppointmentStatus {
+        pending
+        confirmed
+        cancelled
+    }
 
-input CreateAppointmentInput {
-  doctor: AWSJSON!
-  patient: AWSJSON!
-  createdAt: AWSTimestamp!
-  updatedAt: AWSTimestamp
-  status: AppointmentStatus!
-  date: AWSTimestamp
-  doctorId: ID!
-  patientId: ID!
-}
+    enum SortDirection {
+        ASC
+        DESC
+    }
 
-input TableAppointmentFilterInput {
-  doctor: TableStringFilterInput
-  patient: TableStringFilterInput
-  status: TableStringFilterInput
-  date: TableIntFilterInput
-  doctorId: TableStringFilterInput
-  patientID: TableStringFilterInput
-}
+    type Doctor {
+        
+    id: ID!
+    address: String!
+    county: County!
+    metadata: String!
+    hours: [String]
+    latitude: String!
+    longitude: String!
+    name: String!
+    newPatients: Boolean
+    phone: String
+    specialty: String!
+    receiveChats: Boolean
+    bio: String
+    image: AWSURL
+    insuranceAccpeted: Boolean
+    firstVisit: String
+    followUp: String
+    renewal: String
+    bookingFee: String
+    visitLength: String
+    marketToken: String
+    medToken: String
 
-input UpdateAppointmentInput {
-  id: ID!
-  status: AppointmentStatus
-}
+    }
 
-type User {
-  id: ID!
-  confirmed: Boolean
-  firstname: String
-  lastname: String
-  street: String
-  city: String
-  state: State
-  patientID: String
-  expiration: String
-  email: AWSEmail
-  phone: AWSPhone
-  marketToken: String
-  medToken: String
-}
+    type DoctorConnection {
+        items: [Doctor]
+        nextToken: String
+    }
 
-input CreateUserInput {
-  id: ID!
-  confirmed: Boolean
-  firstname: String
-  lastname: String
-  patientID: String
-  expiration: String
-  email: AWSEmail
-  phone: AWSPhone
-  dob: String
-  issued: String
-  street: String
-  city: String
-  state: State
-  marketToken: String
-  medToken: String
-}
+    input TableDoctorFilterInput {
+        address: TableStringFilterInput
+        hours: TableStringFilterInput
+        name: TableStringFilterInput
+        newPatients: TableBooleanFilterInput
+        county: TableStringFilterInput
+    }
 
-input UpdateUserInput {
-  id: ID!
-  confirmed: Boolean
-  firstname: String
-  lastname: String
-  patientID: String
-  expiration: String
-  email: AWSEmail
-  phone: AWSPhone
-  dob: String
-  issued: String
-  street: String
-  city: String
-  state: State
-  marketToken: String
-  medToken: String
-}
+    input UpdateDoctorInput {
+        id: ID!
+        address: String
+        hours: [String]
+        name: String
+        phone: String
+        receiveChats: Boolean
+        bio: String
+        image: AWSURL
+        firstVisit: String
+        followUp: String
+        renewal: String
+        bookingFee: String
+        visitLength: String
+        insuranceAccpeted: Boolean
+        metadata: String
+        marketToken: String
+        medToken: String
+    }
 
-enum SortDirection {
-  ASC
-  DESC
-}
+    input CreateDoctorInput {
+        id: String!
+        address: String!
+        county: String!
+        hours: AWSJSON
+        latitude: String!
+        longitude: String!
+        metadata: String!
+        name: String!
+        newPatients: Boolean!
+        phone: String
+        specialty: String!
+        receiveChats: Boolean
+        pricePerVisit: String
+        bio: String
+        image: AWSURL
+        firstVisit: String
+        followUp: String
+        renewal: String
+        bookingFee: String
+        visitLength: String
+        insuranceAccpeted: Boolean
+        marketToken: String
+        medToken: String
+    }
 
-type Conversation {
-  id: ID!
-  createdAt: AWSTimestamp
-  updatedAt: AWSTimestamp
-  patient: User!
-  doctor: Doctor!
-  patientId: ID!
-  doctorId: ID!
-  didDoctorRead: Boolean
-  didPatientRead: Boolean
-  messages(
-    filter: TableMessageFilterInput
-    sortDirection: SortDirection
-    startFromTime: Int
-    limit: Int
-    nextToken: String
-  ): MessageConnection
-}
+    type Appointment {
+        id: ID!
+        doctor: Doctor!
+        patient: User!
+        doctorId: ID!
+        patientId: ID!
+        createdAt: AWSTimestamp!
+        updatedAt: AWSTimestamp
+        status: AppointmentStatus!
+        date: AWSTimestamp!
+    }
 
-input CreateConversationInput {
-  createdAt: AWSTimestamp
-  updatedAt: AWSTimestamp
-  patientId: ID!
-  doctorId: ID!
-  patient: AWSJSON!
-  doctor: AWSJSON!
-  didDoctorRead: Boolean
-  didPatientRead: Boolean
-}
+    type AppointmentConnection {
+        items: [Appointment]
+        nextToken: String
+    }
 
-input UpdateConversationInput {
-  id: ID!
-  updatedAt: AWSTimestamp
-  didDoctorRead: Boolean
-  didPatientRead: Boolean
-}
+    input CreateAppointmentInput {
+        doctor: AWSJSON!
+        patient: AWSJSON!
+        createdAt: AWSTimestamp!
+        updatedAt: AWSTimestamp
+        status: AppointmentStatus!
+        date: AWSTimestamp
+        doctorId: ID!
+        patientId: ID!
+    }
 
-input TableConversationFilterInput {
-  id: TableIDFilterInput
-  doctorId: TableIDFilterInput
-  patientId: TableIDFilterInput
-}
+    input TableAppointmentFilterInput {
+        doctor: TableStringFilterInput
+        patient: TableStringFilterInput
+        status: TableStringFilterInput
+        date: TableIntFilterInput
+        doctorId: TableStringFilterInput
+        patientID: TableStringFilterInput
+    }
 
-type ConversationConnection {
-  items: [Conversation]
-  nextToken: String
-}
+    input UpdateAppointmentInput {
+        id: ID!
+        status: AppointmentStatus
+    }
 
-type Message {
-  id: ID!
-  text: String!
-  #  The id of the Conversation this message belongs to. This is the table primary key.
-  conversationId: ID!
-  #  The message timestamp. This is also the table sort key.
-  createdAt: AWSTimestamp
-  isSent: Boolean
-  sender: String
-}
+    type User {
+        
+        id: ID!
+        confirmed: Boolean
+        firstname: String
+        lastname: String
+        street: String
+        city: String
+        state: State
+        patientID: String
+        expiration: String
+        email: AWSEmail
+        phone: AWSPhone
+        marketToken: String
+        medToken: String
 
-input CreateMessageInput {
-  conversationId: ID!
-  createdAt: AWSTimestamp
-  sender: String
-  isSent: Boolean
-  text: String!
-  patientId: ID!
-  doctorId: ID!
-}
+    }
 
-input TableMessageFilterInput {
-  conversationId: TableIDFilterInput
-  createdAt: TableIntFilterInput
-  sender: TableStringFilterInput
-  isSent: TableBooleanFilterInput
-  text: TableStringFilterInput
-}
+    input CreateUserInput {
+        id: ID!
+        confirmed: Boolean
+        firstname: String
+        lastname: String
+        patientID: String
+        expiration: String
+        email: AWSEmail
+        phone: AWSPhone
+        dob: String
+        issued: String
+        street: String
+        city: String
+        state: State
+        marketToken: String
+        medToken: String
+    }
 
-type MessageConnection {
-  items: [Message]
-  nextToken: String
-}
+    input UpdateUserInput {
+        id: ID!
+        confirmed: Boolean
+        firstname: String
+        lastname: String
+        patientID: String
+        expiration: String
+        email: AWSEmail
+        phone: AWSPhone
+        dob: String
+        issued: String
+        street: String
+        city: String
+        state: State
+        marketToken: String
+        medToken: String
+    }
 
-input TableBooleanFilterInput {
-  eq: Boolean
-  ne: Boolean
-}
+    type Conversation {
+        id: ID!
+        createdAt: AWSTimestamp
+        updatedAt: AWSTimestamp
+        patient: User!
+        doctor: Doctor!
+        patientId: ID!
+        doctorId: ID!
+        didDoctorRead: Boolean
+        didPatientRead: Boolean
+        messages(
+            filter: TableMessageFilterInput
+            sortDirection: SortDirection
+            startFromTime: Int
+            limit: Int
+            nextToken: String
+        ): MessageConnection
+    }
 
-input TableFloatFilterInput {
-  between: [Float]
-  contains: Float
-  eq: Float
-  ge: Float
-  gt: Float
-  le: Float
-  lt: Float
-  ne: Float
-  notContains: Float
-}
+    type ConversationConnection {
+        items: [Conversation]
+        nextToken: String
+    }
 
-input TableIDFilterInput {
-  beginsWith: ID
-  between: [ID]
-  contains: ID
-  eq: ID
-  ge: ID
-  gt: ID
-  le: ID
-  lt: ID
-  ne: ID
-  notContains: ID
-}
+    input CreateConversationInput {
+        createdAt: AWSTimestamp
+        updatedAt: AWSTimestamp
+        patientId: ID!
+        doctorId: ID!
+        patient: AWSJSON!
+        doctor: AWSJSON!
+        didDoctorRead: Boolean
+        didPatientRead: Boolean
+    }
 
-input TableIntFilterInput {
-  between: [Int]
-  contains: Int
-  eq: Int
-  ge: Int
-  gt: Int
-  le: Int
-  lt: Int
-  ne: Int
-  notContains: Int
-}
+    input UpdateConversationInput {
+        id: ID!
+        updatedAt: AWSTimestamp
+        didDoctorRead: Boolean
+        didPatientRead: Boolean
+    }
 
-input TableStringFilterInput {
-  beginsWith: String
-  between: [String]
-  contains: String
-  eq: String
-  ge: String
-  gt: String
-  le: String
-  lt: String
-  ne: String
-  notContains: String
-}
+    input TableConversationFilterInput {
+        id: TableIDFilterInput
+        doctorId: TableIDFilterInput
+        patientId: TableIDFilterInput
+    }   
 
-type Mutation {
-  createAppointment(input: CreateAppointmentInput): Appointment
-    @aws_auth(cognito_groups: ["Doctor"])
+    type Message {
+        id: ID!
+        text: String!
+        #  The id of the Conversation this message belongs to. This is the table primary key.
+        conversationId: ID!
+        #  The message timestamp. This is also the table sort key.
+        createdAt: AWSTimestamp
+        isSent: Boolean
+        sender: String
+    }
 
-  updateAppointment(input: UpdateAppointmentInput): Appointment
+    type MessageConnection {
+        items: [Message]
+        nextToken: String
+    }
 
-  createMessage(input: CreateMessageInput): Message
+    input CreateMessageInput {
+        conversationId: ID!
+        createdAt: AWSTimestamp
+        sender: String
+        isSent: Boolean
+        text: String!
+        patientId: ID!
+        doctorId: ID!
+    }
 
-  createConversation(input: CreateConversationInput): Conversation
+    input TableMessageFilterInput {
+        conversationId: TableIDFilterInput
+        createdAt: TableIntFilterInput
+        sender: TableStringFilterInput
+        isSent: TableBooleanFilterInput
+        text: TableStringFilterInput
+    }
 
-  updateConversation(input: UpdateConversationInput): Conversation
+    type Mutation {
+        createAppointment(input: CreateAppointmentInput): Appointment
+            @aws_auth(cognito_groups: ["Doctor"])
 
-  createUser(input: CreateUserInput!): User
+        updateAppointment(input: UpdateAppointmentInput): Appointment
 
-  updateUser(input: UpdateUserInput!): User
+        createMessage(input: CreateMessageInput): Message
 
-  updateDoctor(input: UpdateDoctorInput!): Doctor
-    @aws_auth(cognito_groups: ["Doctor"])
-}
+        createConversation(input: CreateConversationInput): Conversation
 
-type Query {
-  listDoctors(
-    filter: TableDoctorFilterInput
-    limit: Int
-    nextToken: String
-  ): DoctorConnection
+        updateConversation(input: UpdateConversationInput): Conversation
 
-  getDoctorsByCounty(metadata: String!, nextToken: String): DoctorConnection
+        createUser(input: CreateUserInput!): User
 
-  getDoctor(id: ID!): Doctor
+        updateUser(input: UpdateUserInput!): User
 
-  getUser(id: ID!): User
+        updateDoctor(input: UpdateDoctorInput!): Doctor
+            @aws_auth(cognito_groups: ["Doctor"])
+    }
 
-  getAppointment(id: ID!): Appointment
+    type Query {
+        listDoctors(
+            filter: TableDoctorFilterInput
+            limit: Int
+            nextToken: String
+        ): DoctorConnection
 
-  getAppointmentsByPatient(
-    patientId: ID!
-    filter: TableAppointmentFilterInput
-  ): AppointmentConnection
+        getDoctorsByCounty(metadata: String!, nextToken: String): DoctorConnection
 
-  getAppointmentsByDoctor(
-    doctorId: ID!
-    from: AWSTimestamp!
-    to: AWSTimestamp!
-    filter: TableAppointmentFilterInput
-  ): AppointmentConnection
+        getDoctor(id: ID!): Doctor
 
-  getConversation(id: ID!, filter: TableConversationFilterInput): Conversation
+        getUser(id: ID!): User
 
-  getConversationsByDoctor(
-    doctorId: ID!
-    filter: TableConversationFilterInput
-  ): ConversationConnection
+        getAppointment(id: ID!): Appointment
 
-  getConversationsByPatient(
-    patientId: ID!
-    filter: TableConversationFilterInput
-  ): ConversationConnection
+        getAppointmentsByPatient(
+            patientId: ID!
+            filter: TableAppointmentFilterInput
+        ): AppointmentConnection
 
-  getMessagesFromAConversation(
-    conversationId: ID!
-    filter: TableMessageFilterInput
-    sortDirection: SortDirection
-    startFromTime: Int
-    limit: Int
-    nextToken: String
-  ): MessageConnection
-}
+        getAppointmentsByDoctor(
+            doctorId: ID!
+            from: AWSTimestamp!
+            to: AWSTimestamp!
+            filter: TableAppointmentFilterInput
+        ): AppointmentConnection
 
-type Subscription {
-  onUpdateConversation(patientId: ID, doctorId: ID): Conversation
-    @aws_subscribe(mutations: ["updateConversation"])
+        getConversation(id: ID!, filter: TableConversationFilterInput): Conversation
 
-  onCreateMessage(conversationId: ID): Message
-    @aws_subscribe(mutations: ["createMessage"])
-}
+        getConversationsByDoctor(
+            doctorId: ID!
+            filter: TableConversationFilterInput
+        ): ConversationConnection
 
-schema {
-  query: Query
-  mutation: Mutation
-  subscription: Subscription
-}
+        getConversationsByPatient(
+            patientId: ID!
+            filter: TableConversationFilterInput
+        ): ConversationConnection
+
+        getMessagesFromAConversation(
+            conversationId: ID!
+            filter: TableMessageFilterInput
+            sortDirection: SortDirection
+            startFromTime: Int
+            limit: Int
+            nextToken: String
+        ): MessageConnection
+    }
+
+    type Subscription {
+        onUpdateConversation(patientId: ID, doctorId: ID): Conversation
+            @aws_subscribe(mutations: ["updateConversation"])
+
+        onCreateMessage(conversationId: ID): Message
+            @aws_subscribe(mutations: ["createMessage"])
+    }
+
+    schema {
+      query: Query
+      mutation: Mutation
+      subscription: Subscription
+    }

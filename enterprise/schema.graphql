@@ -1,354 +1,368 @@
-enum State {
-  NJ
-}
 
-enum Day {
-  Sunday
-  Monday
-  Tuesday
-  Wednesday
-  Thursday
-  Friday
-  Saturday
-}
+  input TableBooleanFilterInput {
+    eq: Boolean
+    ne: Boolean
+  }
 
-type timeblock {
-  day: Day
-  startTime: String
-  endTime: String
-}
+  input TableFloatFilterInput {
+    between: [Float]
+    contains: Float
+    eq: Float
+    ge: Float
+    gt: Float
+    le: Float
+    lt: Float
+    ne: Float
+    notContains: Float
+  }
 
-type StoreDrivers {
-  id: ID
-  firstname: String
-  lastname: String
-}
+  input TableIDFilterInput {
+    beginsWith: ID
+    between: [ID]
+    contains: ID
+    eq: ID
+    ge: ID
+    gt: ID
+    le: ID
+    lt: ID
+    ne: ID
+    notContains: ID
+  }
 
-type Store {
-  id: ID!
-  companyId: ID!
-  hours: [timeblock]
-  inventory: InventoryItemConnection
-  name: String!
-  phone: String
-  latitude: Float!
-  longitude: Float!
-  state: State!
-  city: String!
-  link: AWSURL
-  street: String!
-  zip: String!
-  logo: AWSURL
-  storefrontImage: AWSURL
-  pickup: Boolean
-  delivery: Boolean
-  maxDays: Int
-  drivers: StoreDrivers
-  public: Boolean
-}
+  input TableIntFilterInput {
+    between: [Int]
+    contains: Int
+    eq: Int
+    ge: Int
+    gt: Int
+    le: Int
+    lt: Int
+    ne: Int
+    notContains: Int
+  }
 
-type StoreConnection {
-  items: [Store]
-  nextToken: String
-}
+  input TableStringFilterInput {
+    beginsWith: String
+    between: [String]
+    contains: String
+    eq: String
+    ge: String
+    gt: String
+    le: String
+    lt: String
+    ne: String
+    notContains: String
+  }
 
-input CreateStoreInput {
-  companyId: ID!
-  hours: AWSJSON
-  name: String!
-  phone: AWSPhone
-  latitude: Float!
-  longitude: Float!
-  state: State!
-  city: String!
-  link: AWSURL
-  street: String!
-  zip: String!
-  logo: AWSURL
-  storefrontImage: AWSURL
-  pickup: Boolean
-  delivery: Boolean
-  maxDays: Int
-  drivers: AWSJSON
-  public: Boolean
-}
+    type Store {
+        
+        id: ID!
+        companyId: ID!
+        hours: [timeblock]
+        inventory: InventoryItemConnection
+        name: String!
+        phone: String
+        latitude: Float!
+        longitude: Float!
+        state: State!
+        city: String!
+        link: AWSURL
+        street: String!
+        zip: String!
+        logo: AWSURL
+        storefrontImage: AWSURL
+        pickup: Boolean
+        delivery: Boolean
+        maxDays: Int
+        drivers: StoreDrivers
+        public: Boolean
 
-input UpdateStoreInput {
-  companyId: ID!
-  id: ID!
-  address: String
-  hours: AWSJSON
-  name: String
-  latitude: Float
-  longitude: Float
-  state: State
-  city: String
-  street: String
-  link: AWSURL
-  zip: String
-  phone: AWSPhone
-  logo: AWSURL
-  storefrontImage: AWSURL
-  pickup: Boolean
-  delivery: Boolean
-  maxDays: Int
-  drivers: AWSJSON
-  public: Boolean
-}
+    }
 
-input DeleteStoreInput {
-  companyId: ID!
-  id: ID!
-}
+    type StoreDrivers {
+        
+        id: ID
+        firstname: String
+        lastname: String
 
-input TableStoreFilterInput {
-  city: TableStringFilterInput
-  id: TableIDFilterInput
-  inventory: TableStringFilterInput
-  name: TableStringFilterInput
-  zip: TableStringFilterInput
-  pickup: TableBooleanFilterInput
-  delivery: TableBooleanFilterInput
-}
+    }
 
-type Product {
-  id: ID!
-  name: String!
-  slug: String!
-}
+    type StoreConnection {
+        items: [Store]
+        nextToken: String
+    }
 
-input CreateProductInput {
-  name: String!
-  slug: String!
-}
+    input CreateStoreInput {
+        companyId: ID!
+        hours: AWSJSON
+        name: String!
+        phone: AWSPhone
+        latitude: Float!
+        longitude: Float!
+        state: State!
+        city: String!
+        link: AWSURL
+        street: String!
+        zip: String!
+        logo: AWSURL
+        storefrontImage: AWSURL
+        pickup: Boolean
+        delivery: Boolean
+        maxDays: Int
+        drivers: AWSJSON
+        public: Boolean
+    }
 
-input UpdateProductInput {
-  id: ID!
-  name: String
-  slug: String!
-}
+    input UpdateStoreInput {
+        companyId: ID!
+        id: ID!
+        address: String
+        hours: AWSJSON
+        name: String
+        latitude: Float
+        longitude: Float
+        state: State
+        city: String
+        street: String
+        link: AWSURL
+        zip: String
+        phone: AWSPhone
+        logo: AWSURL
+        storefrontImage: AWSURL
+        pickup: Boolean
+        delivery: Boolean
+        maxDays: Int
+        drivers: AWSJSON
+        public: Boolean
+    }
 
-input ReviewProductInput {
-  id: ID!
-}
+    input DeleteStoreInput {
+        companyId: ID!
+        id: ID!
+    }
 
-input DeleteProductInput {
-  id: ID!
-  slug: String!
-}
+    input TableStoreFilterInput {
+        city: TableStringFilterInput
+        id: TableIDFilterInput
+        inventory: TableStringFilterInput
+        name: TableStringFilterInput
+        zip: TableStringFilterInput
+        pickup: TableBooleanFilterInput
+        delivery: TableBooleanFilterInput
+        public: TableBooleanFilterInput
+    }
 
-type ProductConnection {
-  items: [Product]
-  nextToken: String
-}
+    type Option {
+        
+    amount: Float
+    weight: WeightOptions
 
-input TableProductFilterInput {
-  description: TableStringFilterInput
-  id: TableIDFilterInput
-  name: TableStringFilterInput
-  slug: TableStringFilterInput
-}
+    }
 
-enum ProductType {
-  Flower
-  Concentrate
-  Edible
-  Topical
-  PreRolls
-}
+    type InventoryItem {
+        
+        storeId: ID!
+        id: ID!
+        product: Product!
+        productType: ProductType!
+        image: AWSURL
+        quantity: Float
+        thc: String
+        cbd: String
+        description: String
+        strainType: StrainType
+        brand: String
+        displayName: String
+        price: Float
+        options: [Option]
+        isCannabisProduct: Boolean
+        latitude: Float
+        longitude: Float
+        createdAt: AWSTimestamp
+        updatedAt: AWSTimestamp
 
-enum StrainType {
-  CBD
-  Hybrid
-  Indica
-  Sativa
-}
+    }
 
-enum WeightOptions {
-  gram
-  eighth
-  quarter
-  half
-  ounce
-}
+    type InventoryItemConnection {
+        items: [InventoryItem]
+        nextToken: String
+    }
 
-type Option {
-  amount: Float
-  weight: WeightOptions
-}
+    input CreateInventoryItemInput {
+        storeId: ID!
+        product: String!
+        options: AWSJSON
+        quantity: Float
+        productType: ProductType!
+        thc: String
+        cbd: String
+        image: AWSURL
+        description: String
+        price: Float
+        strainType: StrainType
+        brand: String
+        displayName: String
+        isCannabisProduct: Boolean
+        latitude: Float
+        longitude: Float
+        createdAt: AWSTimestamp!
+        updatedAt: AWSTimestamp
+    }
 
-type InventoryItem {
-  storeId: ID!
-  id: ID!
-  product: Product!
-  productType: ProductType!
-  image: AWSURL
-  quantity: Float
-  thc: String
-  cbd: String
-  description: String
-  strainType: StrainType
-  brand: String
-  displayName: String
-  price: Float
-  options: [Option]
-  isCannabisProduct: Boolean
-  latitude: Float
-  longitude: Float
-  createdAt: AWSTimestamp
-  updatedAt: AWSTimestamp
-}
+    input DeleteInventoryItemInput {
+        storeId: ID!
+        createdAt: AWSTimestamp!
+    }
 
-input CreateInventoryItemInput {
-  storeId: ID!
-  product: String!
-  options: AWSJSON
-  quantity: Float
-  productType: ProductType!
-  thc: String
-  cbd: String
-  image: AWSURL
-  description: String
-  price: Float
-  strainType: StrainType
-  brand: String
-  displayName: String
-  isCannabisProduct: Boolean
-  latitude: Float
-  longitude: Float
-  createdAt: AWSTimestamp!
-  updatedAt: AWSTimestamp
-}
+    input UpdateInventoryItemInput {
+        storeId: ID!
+        thc: String
+        cbd: String
+        options: AWSJSON
+        productType: ProductType
+        quantity: Float
+        product: String
+        image: AWSURL
+        description: String
+        price: Float
+        strainType: StrainType
+        brand: String
+        displayName: String
+        isCannabisProduct: Boolean
+        latitude: Float
+        longitude: Float
+        createdAt: AWSTimestamp!
+        updatedAt: AWSTimestamp
+    }
 
-input DeleteInventoryItemInput {
-  storeId: ID!
-  createdAt: AWSTimestamp!
-}
+    input UpdateStockInput {
+        id: ID!
+        quantity: Float
+    }
 
-type InventoryItemConnection {
-  items: [InventoryItem]
-  nextToken: String
-}
+    input TableInventoryItemFilterInput {
+        id: TableIDFilterInput
+        product: TableStringFilterInput
+        quantity: TableFloatFilterInput
+        productType: TableStringFilterInput
+        isCannabisProduct: TableBooleanFilterInput
+    }
 
-input UpdateInventoryItemInput {
-  storeId: ID!
-  thc: String
-  cbd: String
-  options: AWSJSON
-  productType: ProductType
-  quantity: Float
-  product: String
-  image: AWSURL
-  description: String
-  price: Float
-  strainType: StrainType
-  brand: String
-  displayName: String
-  isCannabisProduct: Boolean
-  latitude: Float
-  longitude: Float
-  createdAt: AWSTimestamp!
-  updatedAt: AWSTimestamp
-}
+    type Product {
+        
+    id: ID!
+    name: String!
+    slug: String!
 
-input UpdateStockInput {
-  id: ID!
-  quantity: Float
-}
+    }
 
-input TableInventoryItemFilterInput {
-  id: TableIDFilterInput
-  product: TableStringFilterInput
-  quantity: TableFloatFilterInput
-  productType: TableStringFilterInput
-  isCannabisProduct: Boolean
-}
+    type ProductConnection {
+        items: [Product]
+        nextToken: String
+    }
 
-input TableBooleanFilterInput {
-  eq: Boolean
-  ne: Boolean
-}
+    input CreateProductInput {
+        name: String!
+        slug: String!
+    }
 
-input TableFloatFilterInput {
-  between: [Float]
-  contains: Float
-  eq: Float
-  ge: Float
-  gt: Float
-  le: Float
-  lt: Float
-  ne: Float
-  notContains: Float
-}
+    input UpdateProductInput {
+        id: ID!
+        name: String
+        slug: String!
+    }
 
-input TableIDFilterInput {
-  beginsWith: ID
-  between: [ID]
-  contains: ID
-  eq: ID
-  ge: ID
-  gt: ID
-  le: ID
-  lt: ID
-  ne: ID
-  notContains: ID
-}
+    input ReviewProductInput {
+        id: ID!
+    }
 
-input TableIntFilterInput {
-  between: [Int]
-  contains: Int
-  eq: Int
-  ge: Int
-  gt: Int
-  le: Int
-  lt: Int
-  ne: Int
-  notContains: Int
-}
+    input DeleteProductInput {
+        id: ID!
+        slug: String!
+    }
 
-input TableStringFilterInput {
-  beginsWith: String
-  between: [String]
-  contains: String
-  eq: String
-  ge: String
-  gt: String
-  le: String
-  lt: String
-  ne: String
-  notContains: String
-}
+    input TableProductFilterInput {
+        description: TableStringFilterInput
+        id: TableIDFilterInput
+        name: TableStringFilterInput
+        slug: TableStringFilterInput
+    }
 
-type Mutation {
-  createProduct(input: CreateProductInput!): Product
-    @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
-  createStore(input: CreateStoreInput!): Store
-    @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
-  updateStore(input: UpdateStoreInput!): Store
-    @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
-  deleteStore(input: DeleteStoreInput): Store
-    @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
-  createInventoryItem(input: CreateInventoryItemInput!): InventoryItem
-    @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
-  updateInventoryItem(input: UpdateInventoryItemInput!): InventoryItem
-    @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
-  deleteInventoryItem(input: DeleteInventoryItemInput!): InventoryItem
-    @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
-}
+    enum ProductType {
+        Flower
+        Concentrate
+        Edible
+        Topical
+        PreRolls
+    }
 
-type Query {
-  getProduct(slug: String!): Product
-  getStore(id: ID!, companyId: ID!): Store
-  getCompanyStores(companyId: ID!): StoreConnection
-  getStoreInventory(
-    storeId: ID!
-    nextToken: String
-    filter: TableInventoryItemFilterInput
-  ): InventoryItemConnection
-}
+    enum StrainType {
+        CBD
+        Hybrid
+        Indica
+        Sativa
+    }
 
-schema {
-  query: Query
-  mutation: Mutation
-  #   subscription: Subscription
-}
+    enum WeightOptions {
+        gram
+        eighth
+        quarter
+        half
+        ounce
+    }
+
+    enum State {
+        NJ
+    }
+
+    enum Day {
+    Sunday
+    Monday
+    Tuesday
+    Wednesday
+    Thursday
+    Friday
+    Saturday
+    }
+
+    type timeblock {
+        
+    day: Day
+    startTime: String
+    endTime: String
+
+    }
+
+    type Mutation {
+      createProduct(input: CreateProductInput!): Product
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      createStore(input: CreateStoreInput!): Store
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      updateStore(input: UpdateStoreInput!): Store
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      deleteStore(input: DeleteStoreInput): Store
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      createInventoryItem(input: CreateInventoryItemInput!): InventoryItem
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      updateInventoryItem(input: UpdateInventoryItemInput!): InventoryItem
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      deleteInventoryItem(input: DeleteInventoryItemInput!): InventoryItem
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+    }
+
+    type Query {
+        getProduct(slug: String!): Product
+        getStore(id: ID!, companyId: ID!): Store
+        getCompanyStores(companyId: ID!): StoreConnection
+        getStoreInventory(
+            storeId: ID!
+            nextToken: String
+            filter: TableInventoryItemFilterInput
+        ): InventoryItemConnection
+    }
+
+    schema {
+      query: Query
+      mutation: Mutation
+      #   subscription: Subscription
+    }

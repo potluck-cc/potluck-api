@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "target": "es5",
+    "lib": ["esnext"],
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": ["node_modules"],
+  "typeRoots": ["node_modules/@types"],
+  "types": ["node"],
+  "baseUrl": ".",
+  "paths": {
+    "enums": ["./enums"],
+    "types": ["./types"],
+    "utility": ["./utility"]
+  }
+}
