@@ -1,5 +1,4 @@
-export default `
-    type Mutation {
+export const fields = `
       createProduct(input: CreateProductInput!): Product
         @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
       createStore(input: CreateStoreInput!): Store
@@ -14,5 +13,15 @@ export default `
         @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
       deleteInventoryItem(input: DeleteInventoryItemInput!): InventoryItem
         @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      updateOrder(input: UpdateOrderInput): Order
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      createOrder(input: CreateOrderInput): Order @aws_cognito_user_pools
+      updateStock(input: UpdateStockInput!): InventoryItem
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+`;
+
+export default `
+    type Mutation {
+      ${fields}
     }
 `;

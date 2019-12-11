@@ -1,0 +1,30 @@
+#if($context.args.filter)
+	#set( $filter = $context.args.filter )
+    #set ($filterWithAuthorization = $filter.put("canAccess", {"contains": "${context.identity.username}" }))
+#else 
+	#set($filter = {})
+    #set ($filterWithAuthorization = $filter.put("canAccess", {"contains": "${context.identity.username}" }))
+#end
+
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "query" : {
+        "expression" : "#doctor = :doctor AND #date BETWEEN :from AND :to",
+        "expressionNames" : {
+            "#doctor": "doctorId",
+            "#date": "date"
+        },
+        "expressionValues" : {
+            ":doctor": { "S" : "$context.args.doctorId" },
+           	":from": { "N" : "$context.args.from" },
+            ":to": { "N" : "$context.args.to" }
+        }
+    },
+    "index" : "doctor-index",
+    "nextToken" : $util.toJson($util.defaultIfNullOrEmpty($ctx.args.nextToken, null)),
+    "scanIndexForward" : false,
+    "consistentRead" : false,
+    "select" : "ALL_ATTRIBUTES",
+    "filter" : $util.transform.toDynamoDBFilterExpression($filter)
+}

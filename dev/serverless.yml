@@ -1,0 +1,753 @@
+---
+service: potluck-api-dev
+
+frameworkVersion: ">=1.21.0 <2.0.0"
+
+plugins:
+  - serverless-appsync-plugin
+
+provider:
+  name: aws
+  region: us-east-1
+  apiname: ${opt:apiname, 'potluck-api-dev'}
+
+custom:
+  accountId: { Ref: AWS::AccountId }
+  appSync:
+    name: potluck-api-dev
+    authenticationType: AMAZON_COGNITO_USER_POOLS
+    userPoolConfig:
+      awsRegion: us-east-1
+      defaultAction: ALLOW
+      userPoolId: us-east-1_42KghV2Sk
+    mappingTemplatesLocation: mapping-templates
+    serviceRole: "AppSyncServiceRole"
+    additionalAuthenticationProviders:
+      - authenticationType: API_KEY
+
+    dataSources:
+      - type: AMAZON_DYNAMODB
+        name: ProductTableDev
+        description: "DynamoDB Product Table"
+        config:
+          tableName: "product-table-dev"
+          serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+      - type: AMAZON_DYNAMODB
+        name: DoctorTableDev
+        description: "DynamoDB Doctor Table"
+        config:
+          tableName: "doctor-table-dev"
+          serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+      - type: AMAZON_DYNAMODB
+        name: StoreTableDev
+        description: "DynamoDB Store Table"
+        config:
+          tableName: "store-table-dev"
+          serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+      - type: AMAZON_DYNAMODB
+        name: InventoryTableDev
+        description: "DynamoDB inventory Table"
+        config:
+          tableName: "inventory-table-dev"
+          serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+      - type: AMAZON_DYNAMODB
+        name: UserTableDev
+        description: "DynamoDB user Table"
+        config:
+          tableName: "user-table-dev"
+          serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+      - type: AMAZON_DYNAMODB
+        name: OrderTableDev
+        description: "DynamoDB order Table"
+        config:
+          tableName: "order-table-dev"
+          serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+      - type: AMAZON_DYNAMODB
+        name: DriverTableDev
+        description: "DynamoDB driver Table"
+        config:
+          tableName: "driver-table-dev"
+          serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+      - type: AMAZON_DYNAMODB
+        name: ConversationTableDev
+        description: "DynamoDB conversation Table"
+        config:
+          tableName: "conversation-table-dev"
+          serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+      - type: AMAZON_DYNAMODB
+        name: MessageTableDev
+        description: "DynamoDB message Table"
+        config:
+          tableName: "message-table-dev"
+          serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+      - type: AMAZON_DYNAMODB
+        name: AppointmentTableDev
+        description: "DynamoDB appointment Table"
+        config:
+          tableName: "appointment-table-dev"
+          serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+
+    mappingTemplates:
+      # Doctor Mutations
+      - dataSource: DoctorTableDev
+        type: Mutation
+        field: createDoctor
+        request: common-create-with-owner-request.vtl
+        response: common-response.vtl
+      # - dataSource: DoctorTableDev
+      #   type: Mutation
+      #   field: deleteDoctor
+      #   request: common-delete-request.vtl
+      #   response: common-response.vtl
+      - dataSource: DoctorTableDev
+        type: Mutation
+        field: updateDoctor
+        request: update-doctor-request.vtl
+        response: common-response.vtl
+      # Doctor Queries
+      - dataSource: DoctorTableDev
+        type: Query
+        field: getDoctor
+        request: common-get-request.vtl
+        response: common-response.vtl
+      # - dataSource: DoctorTableDev
+      #   type: Query
+      #   field: listDoctors
+      #   request: common-list-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: DoctorTableDev
+      #   type: Query
+      #   field: getDoctorsByCounty
+      #   request: get-doctors-by-county-request.vtl
+      #   response: common-response.vtl
+      # Store Mutations
+      - dataSource: StoreTableDev
+        type: Mutation
+        field: createStore
+        request: common-create-request.vtl
+        response: common-response.vtl
+      - dataSource: StoreTableDev
+        type: Mutation
+        field: deleteStore
+        request: delete-store-request.vtl
+        response: common-response.vtl
+      - dataSource: StoreTableDev
+        type: Mutation
+        field: updateStore
+        request: update-store-request.vtl
+        response: common-response.vtl
+      # Store Queries
+      - dataSource: StoreTableDev
+        type: Query
+        field: getStore
+        request: get-store-request.vtl
+        response: common-response.vtl
+      - dataSource: StoreTableDev
+        type: Query
+        field: listStores
+        request: common-list-request.vtl
+        response: common-response.vtl
+      - dataSource: StoreTableDev
+        type: Query
+        field: getCompanyStores
+        request: get-company-stores-request.vtl
+        response: common-response.vtl
+      # - dataSource: InventoryTableDev
+      #   type: Store
+      #   field: inventory
+      #   request: inventory-request.vtl
+      #   response: common-response.vtl
+      # Inventory Mutations
+      - dataSource: InventoryTableDev
+        type: Mutation
+        field: createInventoryItem
+        request: common-create-with-owner-request.vtl
+        response: common-response.vtl
+      - dataSource: InventoryTableDev
+        type: Mutation
+        field: deleteInventoryItem
+        request: delete-inventory-item-request.vtl
+        response: common-response.vtl
+      - dataSource: InventoryTableDev
+        type: Mutation
+        field: updateInventoryItem
+        request: update-inventory-item-request.vtl
+        response: common-response.vtl
+      # Inventory Queries
+      # - dataSource: InventoryTableDev
+      #   type: Query
+      #   field: getInventoryItem
+      #   request: common-get-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: InventoryTableDev
+      #   type: Query
+      #   field: listInventories
+      #   request: common-list-request.vtl
+      #   response: common-response.vtl
+      - dataSource: InventoryTableDev
+        type: Query
+        field: getStoreInventory
+        request: get-store-inventory-request.vtl
+        response: common-response.vtl
+      # - dataSource: ProductTableDev
+      #   type: InventoryItem
+      #   field: product
+      #   request: product-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: StoreTableDev
+      #   type: InventoryItem
+      #   field: store
+      #   request: store-request.vtl
+      #   response: common-response.vtl
+      # Product Mutations
+      - dataSource: ProductTableDev
+        type: Mutation
+        field: createProduct
+        request: common-create-request.vtl
+        response: common-response.vtl
+      # - dataSource: ProductTableDev
+      #   type: Mutation
+      #   field: deleteProduct
+      #   request: common-delete-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: ProductTableDev
+      #   type: Mutation
+      #   field: updateProduct
+      #   request: common-update-request.vtl
+      #   response: common-response.vtl
+      # Product Queries
+      - dataSource: ProductTableDev
+        type: Query
+        field: getProduct
+        request: get-product-request.vtl
+        response: common-response.vtl
+      # - dataSource: ProductTableDev
+      #   type: Query
+      #   field: listProducts
+      #   request: common-list-request.vtl
+      #   response: common-response.vtl
+      # User Mutations
+      - dataSource: UserTableDev
+        type: Mutation
+        field: createUser
+        request: common-create-with-owner-request.vtl
+        response: common-response.vtl
+      # - dataSource: UserTableDev
+      #   type: Mutation
+      #   field: deleteUser
+      #   request: common-delete-request.vtl
+      #   response: common-response.vtl
+      - dataSource: UserTableDev
+        type: Mutation
+        field: updateUser
+        request: update-user-request.vtl
+        response: common-response.vtl
+      # User Queries
+      - dataSource: UserTableDev
+        type: Query
+        field: getUser
+        request: common-get-request.vtl
+        response: owner-can-read-response.vtl
+      # - dataSource: UserTableDev
+      #   type: Query
+      #   field: listUsers
+      #   request: common-list-request.vtl
+      #   response: common-response.vtl
+      # Order Mutations
+      - dataSource: OrderTableDev
+        type: Mutation
+        field: createOrder
+        request: create-order-request.vtl
+        response: common-response.vtl
+      # - dataSource: OrderTableDev
+      #   type: Mutation
+      #   field: deleteOrder
+      #   request: common-delete-request.vtl
+      #   response: common-response.vtl
+      - dataSource: OrderTableDev
+        type: Mutation
+        field: updateOrder
+        request: update-order-request.vtl
+        response: common-response.vtl
+      # Order Queries
+      # - dataSource: OrderTableDev
+      #   type: Query
+      #   field: getOrder
+      #   request: common-get-request.vtl
+      #   response: common-response.vtl
+      - dataSource: OrderTableDev
+        type: Query
+        field: getOrdersByStore
+        request: get-orders-by-store-request.vtl
+        response: common-response.vtl
+      - dataSource: OrderTableDev
+        type: Query
+        field: getOrdersByCustomer
+        request: get-orders-by-customer-request.vtl
+        response: common-response.vtl
+      # - dataSource: OrderTableDev
+      #   type: Query
+      #   field: listOrders
+      #   request: common-list-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: UserTableDev
+      #   type: Order
+      #   field: user
+      #   request: user-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: StoreTableDev
+      #   type: Order
+      #   field: store
+      #   request: store-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: DriverTableDev
+      #   type: Order
+      #   field: driver
+      #   request: driver-request.vtl
+      #   response: common-response.vtl
+      # Driver Mutations
+      # - dataSource: DriverTableDev
+      #   type: Mutation
+      #   field: createDriver
+      #   request: common-create-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: DriverTableDev
+      #   type: Mutation
+      #   field: deleteDriver
+      #   request: common-delete-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: DriverTableDev
+      #   type: Mutation
+      #   field: updateDriver
+      #   request: common-update-request.vtl
+      #   response: common-response.vtl
+      # Driver Queries
+      # - dataSource: DriverTableDev
+      #   type: Query
+      #   field: getDriver
+      #   request: common-get-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: DriverTableDev
+      #   type: Query
+      #   field: listDrivers
+      #   request: common-list-request.vtl
+      #   response: common-response.vtl
+      # Conversation Mutations
+      # - dataSource: ConversationTableDev
+      #   type: Mutation
+      #   field: createConversation
+      #   request: create-conversation-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: ConversationTableDev
+      #   type: Mutation
+      #   field: deleteConversation
+      #   request: common-delete-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: ConversationTableDev
+      #   type: Mutation
+      #   field: updateConversation
+      #   request: update-conversation-request.vtl
+      #   response: common-response.vtl
+      # Conversation Queries
+      # - dataSource: ConversationTableDev
+      #   type: Query
+      #   field: getConversation
+      #   request: common-get-request.vtl
+      #   response: has-access-can-read-response.vtl
+      # - dataSource: ConversationTableDev
+      #   type: Query
+      #   field: listConversations
+      #   request: common-list-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: MessageTableDev
+      #   type: Conversation
+      #   field: messages
+      #   request: messages-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: ConversationTableDev
+      #   type: Query
+      #   field: getConversationsByDoctor
+      #   request: get-conversations-by-doctor-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: ConversationTableDev
+      #   type: Query
+      #   field: getConversationsByPatient
+      #   request: get-conversations-by-patient-request.vtl
+      #   response: common-response.vtl
+      # Message Mutations
+      # - dataSource: MessageTableDev
+      #   type: Mutation
+      #   field: createMessage
+      #   request: common-create-with-owner-request.vtl
+      #   response: common-response.vtl
+      # Message Queries
+      # - dataSource: MessageTableDev
+      #   type: Query
+      #   field: listMessages
+      #   request: common-list-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: MessageTableDev
+      #   type: Query
+      #   field: getMessagesFromAConversation
+      #   request: getMessagesfromAConversation-request.vtl
+      #   response: common-response.vtl
+      # Appointment Mutations
+      # - dataSource: AppointmentTableDev
+      #   type: Mutation
+      #   field: createAppointment
+      #   request: create-appointment-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: AppointmentTableDev
+      #   type: Mutation
+      #   field: deleteAppointment
+      #   request: common-delete-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: AppointmentTableDev
+      #   type: Mutation
+      #   field: updateAppointment
+      #   request: update-appointment-request.vtl
+      #   response: common-response.vtl
+      # Appointment Queries
+      # - dataSource: AppointmentTableDev
+      #   type: Query
+      #   field: getAppointment
+      #   request: common-get-request.vtl
+      #   response: has-access-can-read-response.vtl
+      # - dataSource: AppointmentTableDev
+      #   type: Query
+      #   field: listAppointments
+      #   request: common-list-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: AppointmentTableDev
+      #   type: Query
+      #   field: getAppointmentsByPatient
+      #   request: get-appointments-by-patient-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: AppointmentTableDev
+      #   type: Query
+      #   field: getAppointmentsByDoctor
+      #   request: get-appointments-by-doctor-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: DoctorTableDev
+      #   type: Appointment
+      #   field: doctor
+      #   request: doctor-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: UserTableDev
+      #   type: Appointment
+      #   field: patient
+      #   request: patient-request.vtl
+      #   response: common-response.vtl
+      # Custom Mutations
+      # - dataSource: ProductTableDev
+      #   type: Mutation
+      #   field: reviewProduct
+      #   request: review-product-request.vtl
+      #   response: common-response.vtl
+      # - dataSource: InventoryTableDev
+      #   type: Mutation
+      #   field: updateStock
+      #   request: update-stock-request.vtl
+      #   response: common-response.vtl
+
+    schema: schema.graphql
+
+resources:
+  Resources:
+    StoreTableDev:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync Store Type"
+      Properties:
+        TableName: store-table-dev
+        AttributeDefinitions:
+          - AttributeName: "companyId"
+            AttributeType: "S"
+          - AttributeName: "id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "companyId"
+            KeyType: "HASH"
+          - AttributeName: "id"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    ProductTableDev:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync Product Type"
+      Properties:
+        TableName: product-table-dev
+        AttributeDefinitions:
+          - AttributeName: "slug"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "slug"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    # DoctorTableDev:
+    #   Type: "AWS::DynamoDB::Table"
+    #   DeletionPolicy: Retain
+    #   Description: "Data Store for AWS AppSync Doctor Type"
+    #   Properties:
+    #     TableName: doctor-table-dev
+    #     AttributeDefinitions:
+    #       - AttributeName: "id"
+    #         AttributeType: "S"
+    #       - AttributeName: "metadata"
+    #         AttributeType: "S"
+    #     KeySchema:
+    #       - AttributeName: "id"
+    #         KeyType: "HASH"
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     GlobalSecondaryIndexes:
+    #       - IndexName: metadata-index
+    #         KeySchema:
+    #           - AttributeName: "metadata"
+    #             KeyType: "HASH"
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: "1"
+    #           WriteCapacityUnits: "1"
+
+    InventoryTableDev:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync Inventory Type"
+      Properties:
+        TableName: inventory-table-dev
+        AttributeDefinitions:
+          - AttributeName: "storeId"
+            AttributeType: "S"
+          - AttributeName: "createdAt"
+            AttributeType: "N"
+        KeySchema:
+          - AttributeName: "storeId"
+            KeyType: "HASH"
+          - AttributeName: "createdAt"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    UserTableDev:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync User Type"
+      Properties:
+        TableName: user-table-dev
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    OrderTableDev:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync Order Type"
+      Properties:
+        TableName: order-table-dev
+        AttributeDefinitions:
+          - AttributeName: "customerId"
+            AttributeType: "S"
+          - AttributeName: "dispensaryId"
+            AttributeType: "S"
+          - AttributeName: "createdAt"
+            AttributeType: "N"
+        KeySchema:
+          - AttributeName: "customerId"
+            KeyType: "HASH"
+          - AttributeName: "createdAt"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: dispensary-index
+            KeySchema:
+              - AttributeName: "dispensaryId"
+                KeyType: "HASH"
+              - AttributeName: "createdAt"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: "1"
+              WriteCapacityUnits: "1"
+
+    # DriverTableDev:
+    #   Type: "AWS::DynamoDB::Table"
+    #   DeletionPolicy: Retain
+    #   Description: "Data Store for AWS AppSync Driver Type"
+    #   Properties:
+    #     TableName: driver-table-dev
+    #     AttributeDefinitions:
+    #       - AttributeName: "id"
+    #         AttributeType: "S"
+    #     KeySchema:
+    #       - AttributeName: "id"
+    #         KeyType: "HASH"
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+
+    # ConversationTableDev:
+    #   Type: "AWS::DynamoDB::Table"
+    #   DeletionPolicy: Retain
+    #   Description: "Data Store for AWS AppSync Conversation Type"
+    #   Properties:
+    #     TableName: conversation-table-dev
+    #     AttributeDefinitions:
+    #       - AttributeName: "id"
+    #         AttributeType: "S"
+    #       - AttributeName: "updatedAt"
+    #         AttributeType: "N"
+    #       - AttributeName: "patientId"
+    #         AttributeType: "S"
+    #       - AttributeName: "doctorId"
+    #         AttributeType: "S"
+    #     KeySchema:
+    #       - AttributeName: "id"
+    #         KeyType: "HASH"
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     GlobalSecondaryIndexes:
+    #       - IndexName: patient-timestamp-index
+    #         KeySchema:
+    #           - AttributeName: "patientId"
+    #             KeyType: "HASH"
+    #           - AttributeName: "updatedAt"
+    #             KeyType: "RANGE"
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: "1"
+    #           WriteCapacityUnits: "1"
+    #       - IndexName: doctor-timestamp-index
+    #         KeySchema:
+    #           - AttributeName: "doctorId"
+    #             KeyType: "HASH"
+    #           - AttributeName: "updatedAt"
+    #             KeyType: "RANGE"
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: "1"
+    #           WriteCapacityUnits: "1"
+
+    # MessageTableDev:
+    #   Type: "AWS::DynamoDB::Table"
+    #   DeletionPolicy: Retain
+    #   Description: "Data Store for AWS AppSync Message Type"
+    #   Properties:
+    #     TableName: message-table-dev
+    #     AttributeDefinitions:
+    #       - AttributeName: "conversationId"
+    #         AttributeType: "S"
+    #       - AttributeName: "createdAt"
+    #         AttributeType: "N"
+    #     KeySchema:
+    #       - AttributeName: "conversationId"
+    #         KeyType: "HASH"
+    #       - AttributeName: "createdAt"
+    #         KeyType: "RANGE"
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+
+    # AppointmentTableDev:
+    #   Type: "AWS::DynamoDB::Table"
+    #   DeletionPolicy: Retain
+    #   Description: "Data Store for AWS AppSync Appointment Type"
+    #   Properties:
+    #     TableName: appointment-table-dev
+    #     AttributeDefinitions:
+    #       - AttributeName: "id"
+    #         AttributeType: "S"
+    #       - AttributeName: "patientId"
+    #         AttributeType: "S"
+    #       - AttributeName: "doctorId"
+    #         AttributeType: "S"
+    #       - AttributeName: "date"
+    #         AttributeType: "N"
+    #     KeySchema:
+    #       - AttributeName: "id"
+    #         KeyType: "HASH"
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     GlobalSecondaryIndexes:
+    #       - IndexName: patient-index
+    #         KeySchema:
+    #           - AttributeName: "patientId"
+    #             KeyType: "HASH"
+    #           - AttributeName: "date"
+    #             KeyType: "RANGE"
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: "1"
+    #           WriteCapacityUnits: "1"
+    #       - IndexName: doctor-index
+    #         KeySchema:
+    #           - AttributeName: "doctorId"
+    #             KeyType: "HASH"
+    #           - AttributeName: "date"
+    #             KeyType: "RANGE"
+    #         Projection:
+    #           ProjectionType: ALL
+    #         ProvisionedThroughput:
+    #           ReadCapacityUnits: "1"
+    #           WriteCapacityUnits: "1"
+
+    AppSyncDynamoDBPolicy:
+      Type: "AWS::IAM::ManagedPolicy"
+      Properties:
+        Description: "Managed Policy to allow AWS AppSync to access tables in DynamoDB"
+        Path: /appsync/
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:DeleteItem
+                - dynamodb:UpdateItem
+                - dynamodb:Query
+                - dynamodb:Scan
+                - dynamodb:BatchGetItem
+              Resource: "arn:aws:dynamodb:us-east-1:*:*"
+
+    DynamoDBRole:
+      Type: "AWS::IAM::Role"
+      Description: "IAM Role for allowing AppSync to access DynamoDB"
+      DependsOn:
+        - AppSyncDynamoDBPolicy
+      Properties:
+        RoleName: ${self:provider.apiname}-appsync-dynamodb-role
+        ManagedPolicyArns:
+          - Ref: AppSyncDynamoDBPolicy
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - sts:AssumeRole
+              Principal:
+                Service:
+                  - appsync.amazonaws.com

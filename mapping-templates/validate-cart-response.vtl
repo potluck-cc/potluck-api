@@ -1,0 +1,28 @@
+#set($results = $ctx.result.data["inventory-table-prod"])
+#set($filteredResult = {})
+
+#if( $results.size() > 0 )
+	#set($validItems = [])
+    
+    #foreach( $resultItem in ${results} )
+        #foreach( $argumentItem in ${ctx.args.cart} )
+            #if($argumentItem.item.isCannabisProduct)
+                #if($argumentItem.item.id == $resultItem.id && $argumentItem.quantity && $argumentItem.quantity <= $resultItem.quantity )
+                    $util.qr($validItems.add($resultItem))
+                #end
+            #else
+                #if($argumentItem.item.id == $resultItem.id && $argumentItem.requestedGrams && $argumentItem.requestedGrams <= $resultItem.quantity )
+                    $util.qr($validItems.add($resultItem))
+                #end
+            #end
+        #end
+    #end
+    
+    $util.qr($filteredResult.put('data', $validItems))
+
+#else 
+	$util.qr($filteredResult.put('data', []))
+#end
+
+$util.toJson($filteredResult.data)
+

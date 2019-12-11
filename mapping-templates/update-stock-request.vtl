@@ -1,0 +1,23 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "UpdateItem",
+    "key" : {
+        "storeId": $util.dynamodb.toDynamoDBJson($ctx.args.input.storeId),
+        "id": $util.dynamodb.toDynamoDBJson($ctx.args.input.id)
+    },
+    "update" : {
+        "expression" : #if($ctx.args.input.operator == "+") "SET quantity = quantity + :requestedQuantity" #else  "SET quantity = quantity - :requestedQuantity" #end,
+        "expressionValues" : {
+            ":requestedQuantity" : { "N": "${context.arguments.input.quantity}" }
+        }
+    },
+    "condition": {
+        "expression": "contains(#owner, :expectedOwner)",
+        "expressionNames": {
+            "#owner": "owner"
+        },
+        "expressionValues": {
+            ":expectedOwner": { "S": "${context.identity.username}" },
+        }
+    }
+}

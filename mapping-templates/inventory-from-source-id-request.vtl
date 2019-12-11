@@ -2,14 +2,12 @@
     "version" : "2017-02-28",
     "operation" : "Query",
     "query" : {
-        "expression" : "#storeId = :storeId AND #timestamp >= :timestamp",
+        "expression" : "#storeId = :storeId",
         "expressionNames" : {
-            "#storeId": "storeId",
-            "#timestamp": "createdAt"
+            "#storeId": "storeId"
         },
         "expressionValues" : {
-            ":storeId": { "S" : "$ctx.source.id" },
-            ":timestamp": { "N" : 0 }
+            ":storeId": { "S" : "$ctx.source.id" }
         }
     },
     "nextToken" : $util.toJson($util.defaultIfNullOrEmpty($ctx.args.nextToken, null)),

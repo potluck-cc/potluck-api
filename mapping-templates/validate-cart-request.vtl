@@ -1,0 +1,19 @@
+#set($ids = [])
+#foreach($cartItem in ${ctx.args.cart})
+    #set($map = {})
+    $util.qr($map.put("id", $util.dynamodb.toString($cartItem.item.id)))
+    $util.qr($map.put("storeId", $util.dynamodb.toString($ctx.args.storeId)))
+    $util.qr($ids.add($map))
+#end
+
+{
+    "version" : "2018-05-29",
+    "operation" : "BatchGetItem",
+    "tables" : {
+        "inventory-table-prod": {
+            "keys": $util.toJson($ids),
+            "consistentRead": true
+        }
+    }
+}
+

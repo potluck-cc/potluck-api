@@ -1,5 +1,4 @@
-export default `
-    type Query {
+export const fields = `
         listDoctors(
             filter: TableDoctorFilterInput
             limit: Int
@@ -46,5 +45,10 @@ export default `
             limit: Int
             nextToken: String
         ): MessageConnection
+`;
+
+export default `
+    type Query {
+        ${fields}
     }
 `;

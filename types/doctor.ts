@@ -21,6 +21,9 @@ const doctorFields = `
     visitLength: String
     marketToken: String
     medToken: String
+    stateId: String
+    medCard: String
+    marketWebToken: String
 `;
 
 const types = `
@@ -61,6 +64,9 @@ const inputs = `
         metadata: String
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 
     input CreateDoctorInput {
@@ -87,6 +93,9 @@ const inputs = `
         insuranceAccpeted: Boolean
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 `;
 

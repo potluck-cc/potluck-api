@@ -19,6 +19,8 @@ const storeFields = `
         maxDays: Int
         drivers: StoreDrivers
         public: Boolean
+        slug: String!
+        metadata: String!
 `;
 
 const storeDriverFields = `
@@ -52,6 +54,7 @@ const inputs = `
         longitude: Float!
         state: State!
         city: String!
+        slug: String!
         link: AWSURL
         street: String!
         zip: String!
@@ -62,6 +65,7 @@ const inputs = `
         maxDays: Int
         drivers: AWSJSON
         public: Boolean
+        metadata: String!
     }
 
     input UpdateStoreInput {
@@ -85,6 +89,7 @@ const inputs = `
         maxDays: Int
         drivers: AWSJSON
         public: Boolean
+        metadata: String
     }
 
     input DeleteStoreInput {

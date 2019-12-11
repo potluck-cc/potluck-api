@@ -117,6 +117,9 @@
     visitLength: String
     marketToken: String
     medToken: String
+    stateId: String
+    medCard: String
+    marketWebToken: String
 
     }
 
@@ -151,6 +154,9 @@
         metadata: String
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 
     input CreateDoctorInput {
@@ -177,6 +183,9 @@
         insuranceAccpeted: Boolean
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 
     type Appointment {
@@ -236,6 +245,9 @@
         phone: AWSPhone
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
 
     }
 
@@ -255,6 +267,9 @@
         state: State
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 
     input UpdateUserInput {
@@ -273,6 +288,9 @@
         state: State
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 
     type Conversation {
@@ -358,6 +376,7 @@
     }
 
     type Mutation {
+        
         createAppointment(input: CreateAppointmentInput): Appointment
             @aws_auth(cognito_groups: ["Doctor"])
 
@@ -375,9 +394,11 @@
 
         updateDoctor(input: UpdateDoctorInput!): Doctor
             @aws_auth(cognito_groups: ["Doctor"])
+
     }
 
     type Query {
+        
         listDoctors(
             filter: TableDoctorFilterInput
             limit: Int
@@ -424,14 +445,17 @@
             limit: Int
             nextToken: String
         ): MessageConnection
+
     }
 
     type Subscription {
+        
         onUpdateConversation(patientId: ID, doctorId: ID): Conversation
             @aws_subscribe(mutations: ["updateConversation"])
 
         onCreateMessage(conversationId: ID): Message
             @aws_subscribe(mutations: ["createMessage"])
+
     }
 
     schema {
