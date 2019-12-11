@@ -1,0 +1,29 @@
+#if($context.args.filter)
+	#set( $filter = $context.args.filter )
+    #set ($filterWithAuthorization = $filter.put("canAccess", {"contains": "${context.identity.username}" }))
+#else 
+	#set($filter = {})
+    #set ($filterWithAuthorization = $filter.put("canAccess", {"contains": "${context.identity.username}" }))
+#end
+  
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "query" : {
+        "expression" : "#store = :store AND #date >= :date",
+        "expressionNames" : {
+            "#store": "storeId",
+            "#date": "createdAt"
+        },
+        "expressionValues" : {
+            ":store": { "S" : "$context.args.storeId" },
+            ":date": { "N" : 0 }
+        }
+    },
+    "index" : "store-index",
+    "nextToken" : $util.toJson($util.defaultIfNullOrEmpty($ctx.args.nextToken, null)),
+    "scanIndexForward" : false,
+    "consistentRead" : false,
+    "select" : "ALL_ATTRIBUTES",
+    "filter" : $util.transform.toDynamoDBFilterExpression($filter)
+}

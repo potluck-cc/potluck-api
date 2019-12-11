@@ -102,9 +102,17 @@
 
     enum StrainType {
         CBD
+        HIGHCBD
         Hybrid
         Indica
         Sativa
+    }
+
+    type Geolocation {
+        
+    latitude: Float
+    longitude: Float
+
     }
 
     enum WeightOptions {
@@ -113,6 +121,106 @@
         quarter
         half
         ounce
+    }
+
+    type Order {
+        
+        id: ID!
+        store: Store!
+        customer: User!
+        expectedCompletionDate: AWSTimestamp!
+        createdAt: AWSTimestamp!
+        status: OrderStatus!
+        products: [OrderItem]!
+        storeId: ID!
+        customerId: ID!
+        companyId: ID!
+        discount: Float
+        subtotal: Float!
+        total: Float!
+        tax: Float
+        discountDisplayValue: String
+        subtotalDisplayValue: String!
+        taxDisplayValue: String
+        totalDisplayValue: String!
+        delivery: Boolean
+        pickup: Boolean!
+        pos: Boolean
+        code: String!
+       # driver: Driver
+       # deliveryStatus: DeliveryStatus
+       # dispensaryMessage: String
+
+    }
+
+    type OrderItem {
+        
+        item: InventoryItem!
+        quantity: Int!
+        option: Option
+        requestedGrams: Float
+
+    }
+
+    type OrderConnection {
+        items: [Order]
+        nextToken: String
+    }
+
+    input CreateOrderInput {
+        store: AWSJSON!
+        customer: AWSJSON!
+        total: Float!
+        expectedCompletionDate: AWSTimestamp!
+        createdAt: AWSTimestamp!
+        status: OrderStatus!
+        products: AWSJSON!
+        storeId: ID!
+        companyId: ID!
+        customerId: ID!
+        discount: Float
+        subtotal: Float!
+        code: String!
+        tax: Float
+        discountDisplayValue: String
+        subtotalDisplayValue: String
+        taxDisplayValue: String
+        totalDisplayValue: String
+        delivery: Boolean
+        pickup: Boolean!
+        pos: Boolean
+        driver: String
+        # deliveryStatus: DeliveryStatus
+        # dispensaryMessage: String
+    }
+
+    input UpdateOrderInput {
+        status: OrderStatus
+        storeId: ID!
+        # driver: String
+        # deliveryStatus: DeliveryStatus
+        # dispensaryMessage: String
+        code: String!
+    }
+
+    input TableOrderFilterInput {
+        id: TableIDFilterInput
+        date: TableStringFilterInput
+        status: TableStringFilterInput
+        products: TableStringFilterInput
+        customer: TableStringFilterInput
+        store: TableStringFilterInput
+        delivery: TableBooleanFilterInput
+        code: TableStringFilterInput
+        # driver: TableStringFilterInput
+        # deliveryStatus: TableStringFilterInput
+    }
+
+    enum OrderStatus {
+        new
+        accepted
+        rejected
+        completed
     }
 
     type Doctor @aws_api_key @aws_cognito_user_pools {
@@ -139,6 +247,9 @@
     visitLength: String
     marketToken: String
     medToken: String
+    stateId: String
+    medCard: String
+    marketWebToken: String
 
     }
 
@@ -174,6 +285,9 @@
         metadata: String
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 
     input CreateDoctorInput {
@@ -200,6 +314,9 @@
         insuranceAccpeted: Boolean
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 
     
@@ -233,6 +350,8 @@
         maxDays: Int
         drivers: StoreDrivers
         public: Boolean
+        slug: String!
+        metadata: String!
 
     }
 
@@ -251,6 +370,7 @@
         longitude: Float!
         state: State!
         city: String!
+        slug: String!
         link: AWSURL
         street: String!
         zip: String!
@@ -261,6 +381,7 @@
         maxDays: Int
         drivers: AWSJSON
         public: Boolean
+        metadata: String!
     }
 
     input UpdateStoreInput {
@@ -284,6 +405,7 @@
         maxDays: Int
         drivers: AWSJSON
         public: Boolean
+        metadata: String
     }
 
     input DeleteStoreInput {
@@ -357,6 +479,7 @@
         
         storeId: ID!
         id: ID!
+        metadata: String!
         product: Product!
         productType: ProductType!
         image: AWSURL
@@ -370,8 +493,7 @@
         price: Float
         options: [Option]
         isCannabisProduct: Boolean
-        latitude: Float
-        longitude: Float
+        location: Geolocation
         createdAt: AWSTimestamp
         updatedAt: AWSTimestamp
 
@@ -385,6 +507,7 @@
     
     input CreateInventoryItemInput {
         storeId: ID!
+        metadata: String!
         product: String!
         options: AWSJSON
         quantity: Float
@@ -402,14 +525,16 @@
         longitude: Float
         createdAt: AWSTimestamp!
         updatedAt: AWSTimestamp
+        location: AWSJSON
     }
 
     input DeleteInventoryItemInput {
         storeId: ID!
-        createdAt: AWSTimestamp!
+        id: ID!
     }
 
     input UpdateInventoryItemInput {
+        id: ID!
         storeId: ID!
         thc: String
         cbd: String
@@ -426,13 +551,15 @@
         isCannabisProduct: Boolean
         latitude: Float
         longitude: Float
-        createdAt: AWSTimestamp!
         updatedAt: AWSTimestamp
+        location: AWSJSON
     }
 
     input UpdateStockInput {
+        storeId: ID!
         id: ID!
         quantity: Float
+        operator: String
     }
 
     input TableInventoryItemFilterInput {
@@ -459,6 +586,9 @@
         phone: AWSPhone
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
 
     }
 
@@ -479,6 +609,9 @@
         state: State
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 
     input UpdateUserInput {
@@ -497,6 +630,9 @@
         state: State
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 
     
@@ -509,7 +645,8 @@
         }
     
     type Mutation {
-        createDoctor(input: CreateDoctorInput!): Doctor
+        
+       createDoctor(input: CreateDoctorInput!): Doctor
             @aws_auth(cognito_groups: ["Doctor"])
 
         updateDoctor(input: UpdateDoctorInput!): Doctor
@@ -518,9 +655,15 @@
         createUser(input: CreateUserInput!): User @aws_cognito_user_pools
 
         updateUser(input: UpdateUserInput!): User @aws_cognito_user_pools
+
+        createOrder(input: CreateOrderInput): Order
+
+        updateStock(input: UpdateStockInput!): InventoryItem
+
     }
 
     type Query {
+        
         getDoctor(id: ID!): Doctor @aws_cognito_user_pools
 
         getUser(id: ID!): User @aws_cognito_user_pools
@@ -530,6 +673,26 @@
             limit: Int
             nextToken: String
         ): StoreConnection @aws_api_key @aws_cognito_user_pools
+
+        getOrdersByCustomer(customerId: ID!, nextToken: String): OrderConnection
+
+        getStoreByMetadata(metadata: String!): Store @aws_api_key @aws_cognito_user_pools
+
+        getStoreInventory(
+            storeId: ID!
+            nextToken: String
+            filter: TableInventoryItemFilterInput
+        ): InventoryItemConnection @aws_api_key @aws_cognito_user_pools
+
+        getStoreInventoryWithFilters(            
+            storeId: ID!
+            metadata: String
+            nextToken: String
+            filter: TableInventoryItemFilterInput
+        ): InventoryItemConnection @aws_api_key @aws_cognito_user_pools
+
+        validateCart(cart: AWSJSON!, storeId: ID!): [InventoryItem]
+
     }
 
     schema {

@@ -1,0 +1,944 @@
+
+  input TableBooleanFilterInput {
+    eq: Boolean
+    ne: Boolean
+  }
+
+  input TableFloatFilterInput {
+    between: [Float]
+    contains: Float
+    eq: Float
+    ge: Float
+    gt: Float
+    le: Float
+    lt: Float
+    ne: Float
+    notContains: Float
+  }
+
+  input TableIDFilterInput {
+    beginsWith: ID
+    between: [ID]
+    contains: ID
+    eq: ID
+    ge: ID
+    gt: ID
+    le: ID
+    lt: ID
+    ne: ID
+    notContains: ID
+  }
+
+  input TableIntFilterInput {
+    between: [Int]
+    contains: Int
+    eq: Int
+    ge: Int
+    gt: Int
+    le: Int
+    lt: Int
+    ne: Int
+    notContains: Int
+  }
+
+  input TableStringFilterInput {
+    beginsWith: String
+    between: [String]
+    contains: String
+    eq: String
+    ge: String
+    gt: String
+    le: String
+    lt: String
+    ne: String
+    notContains: String
+  }
+
+    type Appointment {
+        id: ID!
+        doctor: Doctor!
+        patient: User!
+        doctorId: ID!
+        patientId: ID!
+        createdAt: AWSTimestamp!
+        updatedAt: AWSTimestamp
+        status: AppointmentStatus!
+        date: AWSTimestamp!
+    }
+
+    type AppointmentConnection {
+        items: [Appointment]
+        nextToken: String
+    }
+
+    input CreateAppointmentInput {
+        doctor: AWSJSON!
+        patient: AWSJSON!
+        createdAt: AWSTimestamp!
+        updatedAt: AWSTimestamp
+        status: AppointmentStatus!
+        date: AWSTimestamp
+        doctorId: ID!
+        patientId: ID!
+    }
+
+    input TableAppointmentFilterInput {
+        doctor: TableStringFilterInput
+        patient: TableStringFilterInput
+        status: TableStringFilterInput
+        date: TableIntFilterInput
+        doctorId: TableStringFilterInput
+        patientID: TableStringFilterInput
+    }
+
+    input UpdateAppointmentInput {
+        id: ID!
+        status: AppointmentStatus
+    }
+
+    type Store {
+        
+        id: ID!
+        companyId: ID!
+        hours: [timeblock]
+        inventory: InventoryItemConnection
+        name: String!
+        phone: String
+        latitude: Float!
+        longitude: Float!
+        state: State!
+        city: String!
+        link: AWSURL
+        street: String!
+        zip: String!
+        logo: AWSURL
+        storefrontImage: AWSURL
+        pickup: Boolean
+        delivery: Boolean
+        maxDays: Int
+        drivers: StoreDrivers
+        public: Boolean
+        slug: String!
+        metadata: String!
+
+    }
+
+    type StoreDrivers {
+        
+        id: ID
+        firstname: String
+        lastname: String
+
+    }
+
+    type StoreConnection {
+        items: [Store]
+        nextToken: String
+    }
+
+    input CreateStoreInput {
+        companyId: ID!
+        hours: AWSJSON
+        name: String!
+        phone: AWSPhone
+        latitude: Float!
+        longitude: Float!
+        state: State!
+        city: String!
+        slug: String!
+        link: AWSURL
+        street: String!
+        zip: String!
+        logo: AWSURL
+        storefrontImage: AWSURL
+        pickup: Boolean
+        delivery: Boolean
+        maxDays: Int
+        drivers: AWSJSON
+        public: Boolean
+        metadata: String!
+    }
+
+    input UpdateStoreInput {
+        companyId: ID!
+        id: ID!
+        address: String
+        hours: AWSJSON
+        name: String
+        latitude: Float
+        longitude: Float
+        state: State
+        city: String
+        street: String
+        link: AWSURL
+        zip: String
+        phone: AWSPhone
+        logo: AWSURL
+        storefrontImage: AWSURL
+        pickup: Boolean
+        delivery: Boolean
+        maxDays: Int
+        drivers: AWSJSON
+        public: Boolean
+        metadata: String
+    }
+
+    input DeleteStoreInput {
+        companyId: ID!
+        id: ID!
+    }
+
+    input TableStoreFilterInput {
+        city: TableStringFilterInput
+        id: TableIDFilterInput
+        inventory: TableStringFilterInput
+        name: TableStringFilterInput
+        zip: TableStringFilterInput
+        pickup: TableBooleanFilterInput
+        delivery: TableBooleanFilterInput
+        public: TableBooleanFilterInput
+    }
+
+    type Option {
+        
+    amount: Float
+    weight: WeightOptions
+
+    }
+
+    type InventoryItem {
+        
+        storeId: ID!
+        id: ID!
+        metadata: String!
+        product: Product!
+        productType: ProductType!
+        image: AWSURL
+        quantity: Float
+        thc: String
+        cbd: String
+        description: String
+        strainType: StrainType
+        brand: String
+        displayName: String
+        price: Float
+        options: [Option]
+        isCannabisProduct: Boolean
+        location: Geolocation
+        createdAt: AWSTimestamp
+        updatedAt: AWSTimestamp
+
+    }
+
+    type InventoryItemConnection {
+        items: [InventoryItem]
+        nextToken: String
+    }
+
+    input CreateInventoryItemInput {
+        storeId: ID!
+        metadata: String!
+        product: String!
+        options: AWSJSON
+        quantity: Float
+        productType: ProductType!
+        thc: String
+        cbd: String
+        image: AWSURL
+        description: String
+        price: Float
+        strainType: StrainType
+        brand: String
+        displayName: String
+        isCannabisProduct: Boolean
+        latitude: Float
+        longitude: Float
+        createdAt: AWSTimestamp!
+        updatedAt: AWSTimestamp
+        location: AWSJSON
+    }
+
+    input DeleteInventoryItemInput {
+        storeId: ID!
+        id: ID!
+    }
+
+    input UpdateInventoryItemInput {
+        id: ID!
+        storeId: ID!
+        thc: String
+        cbd: String
+        options: AWSJSON
+        productType: ProductType
+        quantity: Float
+        product: String
+        image: AWSURL
+        description: String
+        price: Float
+        strainType: StrainType
+        brand: String
+        displayName: String
+        isCannabisProduct: Boolean
+        latitude: Float
+        longitude: Float
+        updatedAt: AWSTimestamp
+        location: AWSJSON
+    }
+
+    input UpdateStockInput {
+        storeId: ID!
+        id: ID!
+        quantity: Float
+        operator: String
+    }
+
+    input TableInventoryItemFilterInput {
+        id: TableIDFilterInput
+        product: TableStringFilterInput
+        quantity: TableFloatFilterInput
+        productType: TableStringFilterInput
+        isCannabisProduct: TableBooleanFilterInput
+    }
+
+    type Product {
+        
+    id: ID!
+    name: String!
+    slug: String!
+
+    }
+
+    type ProductConnection {
+        items: [Product]
+        nextToken: String
+    }
+
+    input CreateProductInput {
+        name: String!
+        slug: String!
+    }
+
+    input UpdateProductInput {
+        id: ID!
+        name: String
+        slug: String!
+    }
+
+    input ReviewProductInput {
+        id: ID!
+    }
+
+    input DeleteProductInput {
+        id: ID!
+        slug: String!
+    }
+
+    input TableProductFilterInput {
+        description: TableStringFilterInput
+        id: TableIDFilterInput
+        name: TableStringFilterInput
+        slug: TableStringFilterInput
+    }
+
+    type timeblock {
+        
+    day: Day
+    startTime: String
+    endTime: String
+
+    }
+
+    type Conversation {
+        id: ID!
+        createdAt: AWSTimestamp
+        updatedAt: AWSTimestamp
+        patient: User!
+        doctor: Doctor!
+        patientId: ID!
+        doctorId: ID!
+        didDoctorRead: Boolean
+        didPatientRead: Boolean
+        messages(
+            filter: TableMessageFilterInput
+            sortDirection: SortDirection
+            startFromTime: Int
+            limit: Int
+            nextToken: String
+        ): MessageConnection
+    }
+
+    type ConversationConnection {
+        items: [Conversation]
+        nextToken: String
+    }
+
+    input CreateConversationInput {
+        createdAt: AWSTimestamp
+        updatedAt: AWSTimestamp
+        patientId: ID!
+        doctorId: ID!
+        patient: AWSJSON!
+        doctor: AWSJSON!
+        didDoctorRead: Boolean
+        didPatientRead: Boolean
+    }
+
+    input UpdateConversationInput {
+        id: ID!
+        updatedAt: AWSTimestamp
+        didDoctorRead: Boolean
+        didPatientRead: Boolean
+    }
+
+    input TableConversationFilterInput {
+        id: TableIDFilterInput
+        doctorId: TableIDFilterInput
+        patientId: TableIDFilterInput
+    }   
+
+    type Doctor {
+        
+    id: ID!
+    address: String!
+    county: County!
+    metadata: String!
+    hours: [String]
+    latitude: String!
+    longitude: String!
+    name: String!
+    newPatients: Boolean
+    phone: String
+    specialty: String!
+    receiveChats: Boolean
+    bio: String
+    image: AWSURL
+    insuranceAccpeted: Boolean
+    firstVisit: String
+    followUp: String
+    renewal: String
+    bookingFee: String
+    visitLength: String
+    marketToken: String
+    medToken: String
+    stateId: String
+    medCard: String
+    marketWebToken: String
+
+    }
+
+    type DoctorConnection {
+        items: [Doctor]
+        nextToken: String
+    }
+
+    input TableDoctorFilterInput {
+        address: TableStringFilterInput
+        hours: TableStringFilterInput
+        name: TableStringFilterInput
+        newPatients: TableBooleanFilterInput
+        county: TableStringFilterInput
+    }
+
+    input UpdateDoctorInput {
+        id: ID!
+        address: String
+        hours: [String]
+        name: String
+        phone: String
+        receiveChats: Boolean
+        bio: String
+        image: AWSURL
+        firstVisit: String
+        followUp: String
+        renewal: String
+        bookingFee: String
+        visitLength: String
+        insuranceAccpeted: Boolean
+        metadata: String
+        marketToken: String
+        medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
+    }
+
+    input CreateDoctorInput {
+        id: String!
+        address: String!
+        county: String!
+        hours: AWSJSON
+        latitude: String!
+        longitude: String!
+        metadata: String!
+        name: String!
+        newPatients: Boolean!
+        phone: String
+        specialty: String!
+        receiveChats: Boolean
+        pricePerVisit: String
+        bio: String
+        image: AWSURL
+        firstVisit: String
+        followUp: String
+        renewal: String
+        bookingFee: String
+        visitLength: String
+        insuranceAccpeted: Boolean
+        marketToken: String
+        medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
+    }
+
+    type Driver {
+        id: ID!
+        firstname: String
+        lastname: String
+        dob: String
+        licenseNumber: String
+        licenseIssueDate: String
+        licenseExpires: String
+        city: String
+        state: String
+        street: String
+        currentLocation: Geolocation
+        avatar: AWSURL
+        cognitoUsername: String
+        phone: AWSPhone
+    }
+
+    type DriverConnection {
+        items: [Driver]
+        nextToken: String
+    }
+
+    input CreateDriverInput {
+        firstname: String
+        lastname: String
+        dob: String
+        licenseNumber: String
+        licenseIssueDate: String
+        licenseExpires: String
+        city: String
+        state: String
+        street: String
+        currentLocation: AWSJSON
+        avatar: AWSURL
+        cognitoUsername: String
+        phone: AWSPhone
+    }
+
+    input UpdateDriverInput {
+        id: ID!
+        firstname: String
+        lastname: String
+        dob: String
+        licenseNumber: String
+        licenseIssueDate: String
+        licenseExpires: String
+        city: String
+        state: String
+        street: String
+        currentLocation: AWSJSON
+        avatar: AWSURL
+        cognitoUsername: String
+        phone: AWSPhone
+    }
+
+    input TableDriverFilterInput {
+        id: TableIDFilterInput
+        cognitoUsername: TableStringFilterInput
+        phone: TableStringFilterInput
+    }
+
+    type Geolocation {
+        
+    latitude: Float
+    longitude: Float
+
+    }
+
+    type Message {
+        id: ID!
+        text: String!
+        #  The id of the Conversation this message belongs to. This is the table primary key.
+        conversationId: ID!
+        #  The message timestamp. This is also the table sort key.
+        createdAt: AWSTimestamp
+        isSent: Boolean
+        sender: String
+    }
+
+    type MessageConnection {
+        items: [Message]
+        nextToken: String
+    }
+
+    input CreateMessageInput {
+        conversationId: ID!
+        createdAt: AWSTimestamp
+        sender: String
+        isSent: Boolean
+        text: String!
+        patientId: ID!
+        doctorId: ID!
+    }
+
+    input TableMessageFilterInput {
+        conversationId: TableIDFilterInput
+        createdAt: TableIntFilterInput
+        sender: TableStringFilterInput
+        isSent: TableBooleanFilterInput
+        text: TableStringFilterInput
+    }
+
+    type User {
+        
+        id: ID!
+        confirmed: Boolean
+        firstname: String
+        lastname: String
+        street: String
+        city: String
+        state: State
+        patientID: String
+        expiration: String
+        email: AWSEmail
+        phone: AWSPhone
+        marketToken: String
+        medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
+
+    }
+
+    input CreateUserInput {
+        id: ID!
+        confirmed: Boolean
+        firstname: String
+        lastname: String
+        patientID: String
+        expiration: String
+        email: AWSEmail
+        phone: AWSPhone
+        dob: String
+        issued: String
+        street: String
+        city: String
+        state: State
+        marketToken: String
+        medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
+    }
+
+    input UpdateUserInput {
+        id: ID!
+        confirmed: Boolean
+        firstname: String
+        lastname: String
+        patientID: String
+        expiration: String
+        email: AWSEmail
+        phone: AWSPhone
+        dob: String
+        issued: String
+        street: String
+        city: String
+        state: State
+        marketToken: String
+        medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
+    }
+
+    type Order {
+        
+        id: ID!
+        store: Store!
+        customer: User!
+        expectedCompletionDate: AWSTimestamp!
+        createdAt: AWSTimestamp!
+        status: OrderStatus!
+        products: [OrderItem]!
+        storeId: ID!
+        customerId: ID!
+        companyId: ID!
+        discount: Float
+        subtotal: Float!
+        total: Float!
+        tax: Float
+        discountDisplayValue: String
+        subtotalDisplayValue: String!
+        taxDisplayValue: String
+        totalDisplayValue: String!
+        delivery: Boolean
+        pickup: Boolean!
+        pos: Boolean
+        code: String!
+       # driver: Driver
+       # deliveryStatus: DeliveryStatus
+       # dispensaryMessage: String
+
+    }
+
+    type OrderItem {
+        
+        item: InventoryItem!
+        quantity: Int!
+        option: Option
+        requestedGrams: Float
+
+    }
+
+    type OrderConnection {
+        items: [Order]
+        nextToken: String
+    }
+
+    input CreateOrderInput {
+        store: AWSJSON!
+        customer: AWSJSON!
+        total: Float!
+        expectedCompletionDate: AWSTimestamp!
+        createdAt: AWSTimestamp!
+        status: OrderStatus!
+        products: AWSJSON!
+        storeId: ID!
+        companyId: ID!
+        customerId: ID!
+        discount: Float
+        subtotal: Float!
+        code: String!
+        tax: Float
+        discountDisplayValue: String
+        subtotalDisplayValue: String
+        taxDisplayValue: String
+        totalDisplayValue: String
+        delivery: Boolean
+        pickup: Boolean!
+        pos: Boolean
+        driver: String
+        # deliveryStatus: DeliveryStatus
+        # dispensaryMessage: String
+    }
+
+    input UpdateOrderInput {
+        status: OrderStatus
+        storeId: ID!
+        # driver: String
+        # deliveryStatus: DeliveryStatus
+        # dispensaryMessage: String
+        code: String!
+    }
+
+    input TableOrderFilterInput {
+        id: TableIDFilterInput
+        date: TableStringFilterInput
+        status: TableStringFilterInput
+        products: TableStringFilterInput
+        customer: TableStringFilterInput
+        store: TableStringFilterInput
+        delivery: TableBooleanFilterInput
+        code: TableStringFilterInput
+        # driver: TableStringFilterInput
+        # deliveryStatus: TableStringFilterInput
+    }
+
+    enum ProductType {
+        Flower
+        Concentrate
+        Edible
+        Topical
+        PreRolls
+    }
+
+    enum StrainType {
+        CBD
+        HIGHCBD
+        Hybrid
+        Indica
+        Sativa
+    }
+
+    enum WeightOptions {
+        gram
+        eighth
+        quarter
+        half
+        ounce
+    }
+
+    enum State {
+        NJ
+    }
+
+    enum Day {
+    Sunday
+    Monday
+    Tuesday
+    Wednesday
+    Thursday
+    Friday
+    Saturday
+    }
+
+    enum AppointmentStatus {
+        pending
+        confirmed
+        cancelled
+    }
+
+    enum County {
+    Atlantic
+    Bergen
+    Burlington
+    Camden
+    Capemay
+    Cumberland
+    Essex
+    Gloucester
+    Hudson
+    Hunterdon
+    Mercer
+    Middlesex
+    Monmouth
+    Morris
+    Ocean
+    Passaic
+    Salem
+    Somerset
+    Sussex
+    Union
+    Warren
+    }
+
+    enum OrderStatus {
+        new
+        accepted
+        rejected
+        completed
+    }
+
+    enum SortDirection {
+        ASC
+        DESC
+    }
+
+    type Query {
+        
+        getProduct(slug: String!): Product
+        getStore(id: ID!, companyId: ID!): Store
+        getCompanyStores(companyId: ID!): StoreConnection
+        getStoreInventory(
+            storeId: ID!
+            nextToken: String
+            filter: TableInventoryItemFilterInput
+        ): InventoryItemConnection
+        getStoreInventoryWithFilters(            
+            storeId: ID!
+            metadata: String
+            nextToken: String
+            filter: TableInventoryItemFilterInput
+        ): InventoryItemConnection
+        getOrdersByStore(storeId: ID!): OrderConnection
+        getOrdersByStoreAndDate(
+            storeId: ID!
+            from: AWSTimestamp!
+            to: AWSTimestamp! 
+            nextToken: String
+            filter: TableOrderFilterInput
+        ): OrderConnection
+        getOrderByStoreAndCode(
+            storeId: ID!
+            code: String!
+        ): Order
+
+        
+        getDoctor(id: ID!): Doctor @aws_cognito_user_pools
+
+        getUser(id: ID!): User @aws_cognito_user_pools
+
+        listStores(
+            filter: TableStoreFilterInput
+            limit: Int
+            nextToken: String
+        ): StoreConnection @aws_api_key @aws_cognito_user_pools
+
+        getOrdersByCustomer(customerId: ID!, nextToken: String): OrderConnection
+
+        getStoreByMetadata(metadata: String!): Store @aws_api_key @aws_cognito_user_pools
+
+        getStoreInventory(
+            storeId: ID!
+            nextToken: String
+            filter: TableInventoryItemFilterInput
+        ): InventoryItemConnection @aws_api_key @aws_cognito_user_pools
+
+        getStoreInventoryWithFilters(            
+            storeId: ID!
+            metadata: String
+            nextToken: String
+            filter: TableInventoryItemFilterInput
+        ): InventoryItemConnection @aws_api_key @aws_cognito_user_pools
+
+        validateCart(cart: AWSJSON!, storeId: ID!): [InventoryItem]
+
+        
+    getOrdersByStore(storeId: ID!): OrderConnection
+    getOrdersByCustomer(customerId: ID!): OrderConnection
+
+    } 
+
+    type Mutation {
+        
+      createProduct(input: CreateProductInput!): Product
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      createStore(input: CreateStoreInput!): Store
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      updateStore(input: UpdateStoreInput!): Store
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      deleteStore(input: DeleteStoreInput): Store
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      createInventoryItem(input: CreateInventoryItemInput!): InventoryItem
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      updateInventoryItem(input: UpdateInventoryItemInput!): InventoryItem
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      deleteInventoryItem(input: DeleteInventoryItemInput!): InventoryItem
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      updateOrder(input: UpdateOrderInput): Order
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+      createOrder(input: CreateOrderInput): Order @aws_cognito_user_pools
+      updateStock(input: UpdateStockInput!): InventoryItem
+        @aws_auth(cognito_groups: ["Admin", "Dispensaries"])
+
+        
+       createDoctor(input: CreateDoctorInput!): Doctor
+            @aws_auth(cognito_groups: ["Doctor"])
+
+        updateDoctor(input: UpdateDoctorInput!): Doctor
+            @aws_auth(cognito_groups: ["Doctor"])
+
+        createUser(input: CreateUserInput!): User @aws_cognito_user_pools
+
+        updateUser(input: UpdateUserInput!): User @aws_cognito_user_pools
+
+        createOrder(input: CreateOrderInput): Order
+
+        updateStock(input: UpdateStockInput!): InventoryItem
+
+        
+    createOrder(input: CreateOrderInput): Order
+    updateOrder(input: UpdateOrderInput): Order
+
+    }
+
+    schema {
+      query: Query
+      mutation: Mutation
+      # subscription: Subscription
+    }

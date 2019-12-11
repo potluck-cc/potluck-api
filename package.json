@@ -5,12 +5,19 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && node genSchema.js"
+    "build": "tsc && node genSchema.js",
+    "deploy": "npm run build && sls deploy",
+    "genTypes": "node genTypes.js",
+    "pubTypes": "npm publish @potluckmarket-types --access public",
+    "deploy--dev": "node deployDev.js"
   },
   "author": "Ashton Morris",
   "license": "ISC",
   "dependencies": {
+    "@graphql-codegen/core": "^1.8.3",
+    "@graphql-codegen/typescript": "^1.8.3",
     "graphql": "^14.5.8",
+    "graphql-toolkit": "^0.6.6",
     "serverless": "^1.27.3",
     "serverless-appsync-plugin": "^1.1.2"
   },

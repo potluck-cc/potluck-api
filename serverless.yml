@@ -23,6 +23,11 @@ custom:
       serviceRole: "AppSyncServiceRole"
       schema: enterprise/schema.graphql
       mappingTemplatesLocation: mapping-templates
+      additionalAuthenticationProviders:
+        - authenticationType: AMAZON_COGNITO_USER_POOLS
+          userPoolConfig:
+            awsRegion: us-east-1
+            userPoolId: us-east-1_CwBA0oPZ3
 
       dataSources:
         - type: AMAZON_DYNAMODB
@@ -42,6 +47,12 @@ custom:
           description: "Inventory Table"
           config:
             tableName: "inventory-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: OrderTableProd
+          description: "DynamoDB Order Table"
+          config:
+            tableName: "order-table-prod"
             serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
 
       mappingTemplates:
@@ -96,11 +107,23 @@ custom:
           request: update-inventory-item-request.vtl
           response: common-response.vtl
 
+        - dataSource: InventoryTableProd
+          type: Mutation
+          field: updateStock
+          request: update-stock-request.vtl
+          response: common-response.vtl
+
         # Inventory Queries
         - dataSource: InventoryTableProd
           type: Query
           field: getStoreInventory
           request: get-store-inventory-request.vtl
+          response: common-response.vtl
+
+        - dataSource: InventoryTableProd
+          type: Query
+          field: getStoreInventoryWithFilters
+          request: get-store-inventory-with-filters-request.vtl
           response: common-response.vtl
 
         - dataSource: ProductTableProd
@@ -122,6 +145,42 @@ custom:
           field: getProduct
           request: get-product-request.vtl
           response: common-response.vtl
+
+        - dataSource: OrderTableProd
+          type: Query
+          field: getOrderByStoreAndCode
+          request: get-order-by-store-and-code-request.vtl
+          response: synthetic-get-item-response.vtl
+
+        - dataSource: OrderTableProd
+          type: Query
+          field: getOrdersByStore
+          request: get-orders-by-store-request.vtl
+          response: common-response.vtl
+
+        - dataSource: OrderTableProd
+          type: Query
+          field: getOrdersByStoreAndDate
+          request: get-orders-by-store-date-request.vtl
+          response: common-response.vtl
+
+        - dataSource: OrderTableProd
+          type: Mutation
+          field: updateOrder
+          request: update-order-request.vtl
+          response: common-response.vtl
+
+        - dataSource: OrderTableProd
+          type: Mutation
+          field: createOrder
+          request: create-order-request.vtl
+          response: common-response.vtl
+
+        - dataSource: StoreTableProd
+          type: Subscription
+          field: onCreateOrder
+          request: order-subscription-security-request.vtl
+          response: order-subscription-security-response.vtl
 
     - name: potluck-market-api-prod
       authenticationType: AMAZON_COGNITO_USER_POOLS
@@ -166,6 +225,12 @@ custom:
           config:
             tableName: "user-table-prod"
             serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
+        - type: AMAZON_DYNAMODB
+          name: OrderTableProd
+          description: "DynamoDB Order Table"
+          config:
+            tableName: "order-table-prod"
+            serviceRoleArn: { Fn::GetAtt: [DynamoDBRole, Arn] }
 
       mappingTemplates:
         - dataSource: StoreTableProd
@@ -174,10 +239,22 @@ custom:
           request: common-list-request.vtl
           response: common-response.vtl
 
+        - dataSource: StoreTableProd
+          type: Query
+          field: getStoreByMetadata
+          request: get-store-by-metadata-request.vtl
+          response: synthetic-get-item-response.vtl
+
         - dataSource: InventoryTableProd
           type: Store
           field: inventory
           request: inventory-from-source-id-request.vtl
+          response: common-response.vtl
+
+        - dataSource: InventoryTableProd
+          type: Query
+          field: getStoreInventoryWithFilters
+          request: get-store-inventory-with-filters-request.vtl
           response: common-response.vtl
 
         - dataSource: ProductTableProd
@@ -220,6 +297,24 @@ custom:
           type: Mutation
           field: updateUser
           request: update-user-request.vtl
+          response: common-response.vtl
+
+        - dataSource: InventoryTableProd
+          type: Query
+          field: validateCart
+          request: validate-cart-request.vtl
+          response: validate-cart-response.vtl
+
+        - dataSource: OrderTableProd
+          type: Mutation
+          field: createOrder
+          request: create-order-request.vtl
+          response: common-response.vtl
+
+        - dataSource: OrderTableProd
+          type: Query
+          field: getOrdersByCustomer
+          request: get-orders-by-customer-request.vtl
           response: common-response.vtl
 
     - name: potluck-med-prod
@@ -436,14 +531,110 @@ resources:
             AttributeType: "S"
           - AttributeName: "createdAt"
             AttributeType: "N"
+          - AttributeName: "id"
+            AttributeType: "S"
+          - AttributeName: "metadata"
+            AttributeType: "S"
         KeySchema:
           - AttributeName: "storeId"
             KeyType: "HASH"
-          - AttributeName: "createdAt"
+          - AttributeName: "id"
             KeyType: "RANGE"
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        LocalSecondaryIndexes:
+          - IndexName: date-index
+            KeySchema:
+              - AttributeName: "storeId"
+                KeyType: HASH
+              - AttributeName: "createdAt"
+                KeyType: RANGE
+            Projection:
+              NonKeyAttributes:
+                - "createdAt"
+              ProjectionType: INCLUDE
+          - IndexName: metadata-index
+            KeySchema:
+              - AttributeName: "storeId"
+                KeyType: HASH
+              - AttributeName: "metadata"
+                KeyType: RANGE
+            Projection:
+              NonKeyAttributes:
+                - "metadata"
+              ProjectionType: INCLUDE
+
+    UserTableProd:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync User Type"
+      Properties:
+        TableName: user-table-prod
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    OrderTableProd:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync Order Type"
+      Properties:
+        TableName: order-table-prod
+        AttributeDefinitions:
+          - AttributeName: "customerId"
+            AttributeType: "S"
+          - AttributeName: "storeId"
+            AttributeType: "S"
+          - AttributeName: "createdAt"
+            AttributeType: "N"
+          - AttributeName: "expectedCompletionDate"
+            AttributeType: "N"
+          - AttributeName: "code"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "storeId"
+            KeyType: "HASH"
+          - AttributeName: "code"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: customer-index
+            KeySchema:
+              - AttributeName: "customerId"
+                KeyType: "HASH"
+              - AttributeName: "createdAt"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: "1"
+              WriteCapacityUnits: "1"
+        LocalSecondaryIndexes:
+          - IndexName: store-created-index
+            KeySchema:
+              - AttributeName: "storeId"
+                KeyType: HASH
+              - AttributeName: "createdAt"
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: store-completion-index
+            KeySchema:
+              - AttributeName: "storeId"
+                KeyType: HASH
+              - AttributeName: "expectedCompletionDate"
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
 
     DoctorTableProd:
       Type: "AWS::DynamoDB::Table"
@@ -473,14 +664,20 @@ resources:
               ReadCapacityUnits: "1"
               WriteCapacityUnits: "1"
 
-    UserTableProd:
+    ConversationTableProd:
       Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
-      Description: "Data Store for AWS AppSync User Type"
+      Description: "Data Store for AWS AppSync Conversation Type"
       Properties:
-        TableName: user-table-prod
+        TableName: conversation-table-prod
         AttributeDefinitions:
           - AttributeName: "id"
+            AttributeType: "S"
+          - AttributeName: "updatedAt"
+            AttributeType: "N"
+          - AttributeName: "patientId"
+            AttributeType: "S"
+          - AttributeName: "doctorId"
             AttributeType: "S"
         KeySchema:
           - AttributeName: "id"
@@ -488,116 +685,94 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: patient-timestamp-index
+            KeySchema:
+              - AttributeName: "patientId"
+                KeyType: "HASH"
+              - AttributeName: "updatedAt"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: "1"
+              WriteCapacityUnits: "1"
+          - IndexName: doctor-timestamp-index
+            KeySchema:
+              - AttributeName: "doctorId"
+                KeyType: "HASH"
+              - AttributeName: "updatedAt"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: "1"
+              WriteCapacityUnits: "1"
 
-    # ConversationTableProd:
-    #   Type: "AWS::DynamoDB::Table"
-    #   DeletionPolicy: Retain
-    #   Description: "Data Store for AWS AppSync Conversation Type"
-    #   Properties:
-    #     TableName: conversation-table-prod
-    #     AttributeDefinitions:
-    #       - AttributeName: "id"
-    #         AttributeType: "S"
-    #       - AttributeName: "updatedAt"
-    #         AttributeType: "N"
-    #       - AttributeName: "patientId"
-    #         AttributeType: "S"
-    #       - AttributeName: "doctorId"
-    #         AttributeType: "S"
-    #     KeySchema:
-    #       - AttributeName: "id"
-    #         KeyType: "HASH"
-    #     ProvisionedThroughput:
-    #       ReadCapacityUnits: 1
-    #       WriteCapacityUnits: 1
-    #     GlobalSecondaryIndexes:
-    #       - IndexName: patient-timestamp-index
-    #         KeySchema:
-    #           - AttributeName: "patientId"
-    #             KeyType: "HASH"
-    #           - AttributeName: "updatedAt"
-    #             KeyType: "RANGE"
-    #         Projection:
-    #           ProjectionType: ALL
-    #         ProvisionedThroughput:
-    #           ReadCapacityUnits: "1"
-    #           WriteCapacityUnits: "1"
-    #       - IndexName: doctor-timestamp-index
-    #         KeySchema:
-    #           - AttributeName: "doctorId"
-    #             KeyType: "HASH"
-    #           - AttributeName: "updatedAt"
-    #             KeyType: "RANGE"
-    #         Projection:
-    #           ProjectionType: ALL
-    #         ProvisionedThroughput:
-    #           ReadCapacityUnits: "1"
-    #           WriteCapacityUnits: "1"
+    MessageTableProd:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync Message Type"
+      Properties:
+        TableName: message-table-prod
+        AttributeDefinitions:
+          - AttributeName: "conversationId"
+            AttributeType: "S"
+          - AttributeName: "createdAt"
+            AttributeType: "N"
+        KeySchema:
+          - AttributeName: "conversationId"
+            KeyType: "HASH"
+          - AttributeName: "createdAt"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
-    # MessageTableProd:
-    #   Type: "AWS::DynamoDB::Table"
-    #   DeletionPolicy: Retain
-    #   Description: "Data Store for AWS AppSync Message Type"
-    #   Properties:
-    #     TableName: message-table-prod
-    #     AttributeDefinitions:
-    #       - AttributeName: "conversationId"
-    #         AttributeType: "S"
-    #       - AttributeName: "createdAt"
-    #         AttributeType: "N"
-    #     KeySchema:
-    #       - AttributeName: "conversationId"
-    #         KeyType: "HASH"
-    #       - AttributeName: "createdAt"
-    #         KeyType: "RANGE"
-    #     ProvisionedThroughput:
-    #       ReadCapacityUnits: 1
-    #       WriteCapacityUnits: 1
-
-    # AppointmentTableProd:
-    #   Type: "AWS::DynamoDB::Table"
-    #   DeletionPolicy: Retain
-    #   Description: "Data Store for AWS AppSync Appointment Type"
-    #   Properties:
-    #     TableName: appointment-table-prod
-    #     AttributeDefinitions:
-    #       - AttributeName: "id"
-    #         AttributeType: "S"
-    #       - AttributeName: "patientId"
-    #         AttributeType: "S"
-    #       - AttributeName: "doctorId"
-    #         AttributeType: "S"
-    #       - AttributeName: "date"
-    #         AttributeType: "N"
-    #     KeySchema:
-    #       - AttributeName: "id"
-    #         KeyType: "HASH"
-    #     ProvisionedThroughput:
-    #       ReadCapacityUnits: 1
-    #       WriteCapacityUnits: 1
-    #     GlobalSecondaryIndexes:
-    #       - IndexName: patient-index
-    #         KeySchema:
-    #           - AttributeName: "patientId"
-    #             KeyType: "HASH"
-    #           - AttributeName: "date"
-    #             KeyType: "RANGE"
-    #         Projection:
-    #           ProjectionType: ALL
-    #         ProvisionedThroughput:
-    #           ReadCapacityUnits: "1"
-    #           WriteCapacityUnits: "1"
-    #       - IndexName: doctor-index
-    #         KeySchema:
-    #           - AttributeName: "doctorId"
-    #             KeyType: "HASH"
-    #           - AttributeName: "date"
-    #             KeyType: "RANGE"
-    #         Projection:
-    #           ProjectionType: ALL
-    #         ProvisionedThroughput:
-    #           ReadCapacityUnits: "1"
-    #           WriteCapacityUnits: "1"
+    AppointmentTableProd:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Description: "Data Store for AWS AppSync Appointment Type"
+      Properties:
+        TableName: appointment-table-prod
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: "S"
+          - AttributeName: "patientId"
+            AttributeType: "S"
+          - AttributeName: "doctorId"
+            AttributeType: "S"
+          - AttributeName: "date"
+            AttributeType: "N"
+        KeySchema:
+          - AttributeName: "id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: patient-index
+            KeySchema:
+              - AttributeName: "patientId"
+                KeyType: "HASH"
+              - AttributeName: "date"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: "1"
+              WriteCapacityUnits: "1"
+          - IndexName: doctor-index
+            KeySchema:
+              - AttributeName: "doctorId"
+                KeyType: "HASH"
+              - AttributeName: "date"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: "1"
+              WriteCapacityUnits: "1"
 
     AppSyncDynamoDBPolicy:
       Type: "AWS::IAM::ManagedPolicy"

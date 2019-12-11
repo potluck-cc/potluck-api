@@ -1,0 +1,17 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "query" : {
+        "expression" : "#metadata = :metadata",
+        "expressionNames" : {
+            "#metadata": "metadata"
+        },
+        "expressionValues" : {
+            ":metadata": { "S" : "$context.args.metadata" }
+        }
+    },
+    "index": "metadata-index",
+    "scanIndexForward" : false,
+    "consistentRead" : false,
+    "select" : "ALL_ATTRIBUTES"
+}

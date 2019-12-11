@@ -1,0 +1,34 @@
+#if ($context.args.patientId)
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "query" : {
+        "expression": "id = :id and updatedAt = :updatedAt",
+        "expressionValues" : {
+            ":id" : {
+                "S" : "${context.args.patientId}"
+            }
+        }
+    },
+    "index" : "patient-timestamp-index",
+    "limit": #if(${context.args.first}) ${context.args.first} #else 20 #end,
+    "nextToken": #if(${context.args.after}) "${context.args.after}" #else null #end,
+    "filter" : #if($context.args.filter) $util.transform.toDynamoDBFilterExpression($ctx.args.filter) #else null #end,
+}
+#else
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "query" : {
+        "expression": "id = :id and updatedAt = :updatedAt",
+        "expressionValues" : {
+            ":id" : {
+                "S" : "${context.args.doctorId}"
+            }
+        }
+    },
+    "limit": #if(${context.args.first}) ${context.args.first} #else 20 #end,
+    "nextToken": #if(${context.args.after}) "${context.args.after}" #else null #end,
+    "filter" : #if($context.args.filter) $util.transform.toDynamoDBFilterExpression($ctx.args.filter) #else null #end,
+}
+#end

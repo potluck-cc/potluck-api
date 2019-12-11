@@ -1,0 +1,5 @@
+#if(${context.identity.username} != ${context.result.companyId})
+    $utils.unauthorized()
+#else
+	null
+#end

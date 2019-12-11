@@ -1,0 +1,12 @@
+#if($ctx.args.input.companyId == $context.identity.username)
+{
+  "version": "2017-02-28",
+  "operation": "DeleteItem",
+  "key": {
+    "companyId": $util.dynamodb.toDynamoDBJson($ctx.args.input.companyId),
+    "id": $util.dynamodb.toDynamoDBJson($ctx.args.input.id)
+  },
+}
+#else
+    $utils.unauthorized()
+#end

@@ -6,6 +6,7 @@ const optionFields = `
 const inventoryItemFields = `
         storeId: ID!
         id: ID!
+        metadata: String!
         product: Product!
         productType: ProductType!
         image: AWSURL
@@ -19,8 +20,7 @@ const inventoryItemFields = `
         price: Float
         options: [Option]
         isCannabisProduct: Boolean
-        latitude: Float
-        longitude: Float
+        location: Geolocation
         createdAt: AWSTimestamp
         updatedAt: AWSTimestamp
 `;
@@ -43,6 +43,7 @@ const types = `
 const inputs = `
     input CreateInventoryItemInput {
         storeId: ID!
+        metadata: String!
         product: String!
         options: AWSJSON
         quantity: Float
@@ -60,14 +61,16 @@ const inputs = `
         longitude: Float
         createdAt: AWSTimestamp!
         updatedAt: AWSTimestamp
+        location: AWSJSON
     }
 
     input DeleteInventoryItemInput {
         storeId: ID!
-        createdAt: AWSTimestamp!
+        id: ID!
     }
 
     input UpdateInventoryItemInput {
+        id: ID!
         storeId: ID!
         thc: String
         cbd: String
@@ -84,13 +87,15 @@ const inputs = `
         isCannabisProduct: Boolean
         latitude: Float
         longitude: Float
-        createdAt: AWSTimestamp!
         updatedAt: AWSTimestamp
+        location: AWSJSON
     }
 
     input UpdateStockInput {
+        storeId: ID!
         id: ID!
         quantity: Float
+        operator: String
     }
 
     input TableInventoryItemFilterInput {

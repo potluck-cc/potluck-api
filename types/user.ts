@@ -12,6 +12,9 @@ const userFields = `
         phone: AWSPhone
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
 `;
 
 const types = `
@@ -37,6 +40,9 @@ const inputs = `
         state: State
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 
     input UpdateUserInput {
@@ -55,6 +61,9 @@ const inputs = `
         state: State
         marketToken: String
         medToken: String
+        stateId: String
+        medCard: String
+        marketWebToken: String
     }
 `;
 

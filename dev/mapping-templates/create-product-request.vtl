@@ -1,0 +1,23 @@
+{
+  "version": "2017-02-28",
+  "operation": "PutItem",
+  "key": {
+    "id": $util.dynamodb.toDynamoDBJson($util.autoId()),
+  },
+  "attributeValues": {
+  	"name": { "S": "${ctx.args.input.name}"},
+    "description": { "S": "${ctx.args.input.description}"},
+    "strainType": { "S": "${ctx.args.input.strainType}"},
+    "productType": { "S": "${ctx.args.input.productType}" },
+    "searchField": { "S": "${ctx.args.input.searchField}" },
+  	"negatives": {"M": {}},
+    "effects": {"M": {}},
+    "medical": {"M": {}}
+  },
+  "condition": {
+    "expression": "attribute_not_exists(#id)",
+    "expressionNames": {
+      "#id": "id",
+    },
+  },
+}

@@ -1,4 +1,6 @@
-import * as fs from "fs";
+import { writeFile } from "fs";
+import { join } from "path";
+import { chdir } from "process";
 
 const baseSchema = `
   input TableBooleanFilterInput {
@@ -66,9 +68,11 @@ export function buildSchema({
   targetLocation: string;
   fileName: string;
 }) {
-  fs.writeFile(
-    `${targetLocation}/${fileName}`,
+  chdir("/Users/ashtonmorris/Desktop/potluck/potluck-api/");
+
+  writeFile(
+    join(targetLocation, fileName),
     baseSchema.concat(...typeDefinitions),
-    err => (err ? console.log("err") : "The file was saved!")
+    err => (err ? console.log(err) : "The file was saved!")
   );
 }

@@ -1,0 +1,9 @@
+#if($ctx.source.product.id)
+    $utils.toJson({
+        id: $context.source.product.id,
+        slug: $context.source.product.slug,
+        name: $context.source.product.name
+    })
+#else
+    $utils.toJson($context.result);
+#end

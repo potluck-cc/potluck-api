@@ -1,5 +1,4 @@
-export default `
-    type Mutation {
+export const fields = `
         createAppointment(input: CreateAppointmentInput): Appointment
             @aws_auth(cognito_groups: ["Doctor"])
 
@@ -17,5 +16,10 @@ export default `
 
         updateDoctor(input: UpdateDoctorInput!): Doctor
             @aws_auth(cognito_groups: ["Doctor"])
+`;
+
+export default `
+    type Mutation {
+        ${fields}
     }
 `;

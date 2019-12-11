@@ -1,0 +1,12 @@
+#set($authorized = false)
+#foreach($item in $context.result.items["canAccess"])
+    #if($item == $context.identity.username)
+        #set($authorized = true)
+    #end
+#end
+
+#if($authorized)
+    $utils.toJson($context.result);
+#else
+    $utils.unauthorized()
+#end

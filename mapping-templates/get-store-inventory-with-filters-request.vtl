@@ -1,0 +1,21 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "query" : {
+        "expression" : "#storeId = :storeId AND begins_with(#metadata, :metadata)",
+        "expressionNames" : {
+            "#storeId": "storeId",
+            "#metadata": "metadata"
+        },
+        "expressionValues" : {
+            ":storeId": { "S" : "$context.args.storeId" },
+            ":metadata": { "S" : "$context.args.metadata" }
+        }
+    },
+    "index": "metadata-index",
+    "nextToken" : $util.toJson($util.defaultIfNullOrEmpty($ctx.args.nextToken, null)),
+    "scanIndexForward" : false,
+    "consistentRead" : false,
+    "select" : "ALL_ATTRIBUTES",
+    "filter" : #if($context.args.filter) $util.transform.toDynamoDBFilterExpression($ctx.args.filter) #else null #end,
+}

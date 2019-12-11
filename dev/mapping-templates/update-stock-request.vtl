@@ -1,0 +1,14 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "UpdateItem",
+    "key" : {
+        "id" : { "S" : "${context.arguments.input.id}" }
+    },
+    "update" : {
+        "expression" : "SET quantity = quantity - :requestedQuantity",
+        "expressionValues" : {
+            ":requestedQuantity" : { "N": "${context.arguments.input.quantity}" }
+        }
+    },
+  },
+}

@@ -12,6 +12,7 @@
             ":timestamp": { "N" : 0 }
         }
     },
+    "index": "date-index",
     "nextToken" : $util.toJson($util.defaultIfNullOrEmpty($ctx.args.nextToken, null)),
     "scanIndexForward" : false,
     "consistentRead" : false,

@@ -26,8 +26,8 @@ function generateListOfSchemaJSFiles(directory = process.env.PWD, onComplete) {
   });
 }
 
-generateListOfSchemaJSFiles(undefined, file => {
-  exec(`node ${file}`, error => {
+generateListOfSchemaJSFiles(undefined, async file => {
+  await exec(`node ${file}`, error => {
     console.log(`Generating GraphQL Schema @ ${file}`);
     if (error !== null) {
       console.log("error:" + error);

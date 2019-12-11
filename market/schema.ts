@@ -5,7 +5,9 @@ import {
   generateProduct,
   generateInventoryItem,
   generateUser,
-  generateTimeblock
+  generateTimeblock,
+  order,
+  geolocation
 } from "../types";
 import {
   county,
@@ -13,7 +15,8 @@ import {
   day,
   productType,
   strainType,
-  weightOptions
+  weightOptions,
+  orderStatus
 } from "../enums";
 import mutations from "./mutations";
 import queries from "./queries";
@@ -25,13 +28,16 @@ const schema = `
     }
 `;
 
-const medSchema = [
+const marketSchema = [
   county,
   state,
   day,
   productType,
   strainType,
+  geolocation,
   weightOptions,
+  order,
+  orderStatus,
   generateDoctor("@aws_api_key @aws_cognito_user_pools"),
   generateStore("@aws_api_key @aws_cognito_user_pools"),
   generateProduct("@aws_api_key @aws_cognito_user_pools"),
@@ -44,7 +50,7 @@ const medSchema = [
 ];
 
 buildSchema({
-  typeDefinitions: medSchema,
+  typeDefinitions: marketSchema,
   targetLocation: "./market",
   fileName: "schema.graphql"
 });

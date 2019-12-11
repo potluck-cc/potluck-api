@@ -4,7 +4,8 @@
     "target": "es5",
     "lib": ["esnext"],
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "declaration": true
   },
   "exclude": ["node_modules"],
   "typeRoots": ["node_modules/@types"],
